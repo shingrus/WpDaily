@@ -3,9 +3,11 @@ package com.shingrus.wpdaily;
 import android.app.WallpaperManager;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.net.URLConnection;
 
 /**
  * Created by shingrus on 23/11/15.
+ * JobService
  */
 public class PeriodicalJobService extends JobService {
 
@@ -33,25 +36,8 @@ public class PeriodicalJobService extends JobService {
         @Override
         protected Void doInBackground(Void... params) {
 
-            SetWallPaper setWallPaper = SetWallPaper.getSetWallPaper();
-            URL imageUrl = setWallPaper.GetLastWallpaperLink();
-            if (imageUrl != null) {
-                //i have new url,
-
-                Bitmap image = SetWallPaper.getSetWallPaper().getImage(imageUrl);
-
-
-
-                if (image != null) {
-                    WallpaperManager wp = WallpaperManager.getInstance(jobService);
-                    try {
-                        wp.setBitmap(image);
-                    } catch (IOException e) {
-                        Log.e(_log_tag, "set image error" + e);
-                    }
-                }
-            }
-
+            Log.d(_log_tag, "Start bg job");
+            SetWallPaper.getSetWallPaper().updateWallPaperImage();
             return null;
         }
 

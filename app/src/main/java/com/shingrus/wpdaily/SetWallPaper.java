@@ -1,8 +1,12 @@
 package com.shingrus.wpdaily;
 
+import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Xml;
 
@@ -18,6 +22,7 @@ import java.net.URLConnection;
 
 /**
  * Created by shingrus on 24/11/15.
+ * Main souce for updating wallpaper
  */
 public final class SetWallPaper {
 
@@ -29,24 +34,28 @@ public final class SetWallPaper {
     private static String MagicURLReplacementFrom = "360x270";
     private static String MagicURLReplacementTo = "990x742";
 
+    private static String LAST_IMAGE_URL_KEY = "last_image_url";
+
 
     private SetWallPaper(Context ctx) {
         this.appContext = ctx;
     }
 
-    public static final synchronized  SetWallPaper getSetWallPaper(Context ctx) {
+    public static synchronized  SetWallPaper getSetWallPaper(Context ctx) {
         if (ctx != null && setWallPaper == null) {
             setWallPaper = new SetWallPaper(ctx);
         }
         return setWallPaper;
     }
 
-    public static final synchronized SetWallPaper getSetWallPaper() {
+    public static  synchronized SetWallPaper getSetWallPaper() {
         return setWallPaper;
     }
 
 
-    public Bitmap getImage(URL url) {
+    private Bitmap getImage(URL url) {
+
+        //TODO: check for cached images
         Bitmap bmp = null;
         if (url != null) {
             try {
@@ -62,15 +71,58 @@ public final class SetWallPaper {
     }
 
     /**
+     *
+     * @param image - Bitmap image, that should be set as WP
+     * @return true if success, false - overvise
+     */
+    private boolean setWallPaperImage(Bitmap image) {
+        boolean retVal = false;
+        if (image != null) {
+            WallpaperManager wp = WallpaperManager.getInstance(appContext);
+            try {
+                wp.setBitmap(image);
+                retVal = true;
+            } catch (IOException e) {
+                Log.e(_log_tag, "set image error" + e);
+            }
+        }
+        return retVal;
+    }
+
+    private void setWallPaperImage(URL url) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
+        String lastUrl = preferences.getString(LAST_IMAGE_URL_KEY, "");
+        if (lastUrl.length() == 0 && !lastUrl.equals(url.toString())) {
+            if(setWallPaperImage(getImage(url))) {
+                SharedPreferences.Editor e = preferences.edit();
+                e.putString(LAST_IMAGE_URL_KEY, url.toString());
+                e.apply();
+            }
+        }
+        else
+            Log.d(_log_tag, "We already set this image: "+url);
+
+    }
+
+    public void updateWallPaperImage() {
+        URL imageUrl = setWallPaper.GetLastWallpaperLink();
+        if (imageUrl != null) {
+            setWallPaperImage(imageUrl);
+        }
+
+    }
+
+    /**
      * @return null if didn't find or url obj ad
      */
-    public URL GetLastWallpaperLink() {
+    private URL GetLastWallpaperLink() {
         URL retrunValue = null;
 
         try {
             URL listOfImages = new URL(whereGetImages);
-            URLConnection connection = null;
+
             try {
+                URLConnection connection;
                 connection = listOfImages.openConnection();
                 if ((connection instanceof HttpURLConnection)) {
                     HttpURLConnection httpcon = (HttpURLConnection) connection;
@@ -89,7 +141,7 @@ public final class SetWallPaper {
                                 //parser.require(XmlPullParser.START_TAG, null, "channel");
                                 parser.setInput(connection.getInputStream(), null);
                                 parser.nextTag();
-                                boolean insideItem = false, insideEnclosure= false; //here is some magic
+                                boolean insideItem = false; //here is some magic
 
 
                                 while (parser.next() != XmlPullParser.END_DOCUMENT){
@@ -101,7 +153,6 @@ public final class SetWallPaper {
                                             insideItem = true;
                                         }
                                         else if (insideItem && name.contentEquals("enclosure")) {
-                                            insideEnclosure = true;
                                             String xmlAttr = parser.getAttributeValue(null, "url");
                                             if (xmlAttr != null) {
                                                 String newUrl = xmlAttr.replace(MagicURLReplacementFrom,MagicURLReplacementTo);
@@ -109,10 +160,6 @@ public final class SetWallPaper {
 
                                             }
 
-                                            break;
-                                        }
-                                        else if (insideItem && insideEnclosure) {
-                                            //we soppose to be inside tag enclosure, but didn't get text
                                             break;
                                         }
 
