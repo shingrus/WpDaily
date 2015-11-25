@@ -92,7 +92,7 @@ public final class SetWallPaper {
     private void setWallPaperImage(URL url) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         String lastUrl = preferences.getString(LAST_IMAGE_URL_KEY, "");
-        if (lastUrl.length() == 0 && !lastUrl.equals(url.toString())) {
+        if (!lastUrl.equals(url.toString())) {
             if(setWallPaperImage(getImage(url))) {
                 SharedPreferences.Editor e = preferences.edit();
                 e.putString(LAST_IMAGE_URL_KEY, url.toString());
