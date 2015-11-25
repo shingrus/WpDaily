@@ -61,6 +61,8 @@ public class PeriodicalJobService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
+
+        Log.d(_log_tag, "Job finished");
         return true;
     }
 
