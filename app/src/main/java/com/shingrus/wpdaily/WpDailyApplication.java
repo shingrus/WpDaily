@@ -82,7 +82,6 @@ public class WpDailyApplication extends Application {
             JobInfo job = new JobInfo.Builder(JOB_ID, new ComponentName(this, PeriodicalJobService.class))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .setMinimumLatency(freq * 60 * 1000)
-                            //.setMinimumLatency(6 * 1000)
                     .setRequiresCharging(false)
                     .build();
             scheduler.schedule(job);
