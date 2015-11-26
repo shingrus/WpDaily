@@ -46,4 +46,6 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="update_freq_list">upadate_freq_list</string>
+    <string name="updateButtonLabel">Update Wallpaper</string>
+    <string name="updateButtonKey">updatebutton</string>
 </resources>

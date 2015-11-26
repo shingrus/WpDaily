@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -94,6 +95,8 @@ public final class SetWallPaper {
         String lastUrl = preferences.getString(LAST_IMAGE_URL_KEY, "");
         if (!lastUrl.equals(url.toString())) {
             if(setWallPaperImage(getImage(url))) {
+                Log.d(_log_tag, "Set new image:" + url);
+
                 SharedPreferences.Editor e = preferences.edit();
                 e.putString(LAST_IMAGE_URL_KEY, url.toString());
                 e.apply();

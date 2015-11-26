@@ -30,4 +30,8 @@
         android:positiveButtonText="@null"
         android:title="@string/pref_title_sync_frequency" />
 
+    <Preference  android:key="@string/updateButtonKey" android:title="@string/updateButtonLabel"/>
+
+
+
 </PreferenceScreen>

@@ -49,26 +49,6 @@ public class WpDailyApplication extends Application {
 
                 }
             };
-    private class UpdateTask extends AsyncTask<Void, Void, Void> {
-
-
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-
-            setWallPaper.updateWallPaperImage();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void avoid) {
-            Toast t = Toast.makeText(getApplicationContext(), "WallPaper updated", Toast.LENGTH_LONG);
-            t.show();
-
-        }
-
-    }
 
 
     /**
@@ -98,7 +78,6 @@ public class WpDailyApplication extends Application {
         setWallPaper = SetWallPaper.getSetWallPaper(this);
 
         //update on start
-        //new UpdateTask().execute();
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String freq = pref.getString(freqKey, "360");

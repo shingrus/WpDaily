@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -18,7 +19,12 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -117,6 +123,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         .getString(preference.getKey(), ""));
     }
 
+
+    private static Boolean isExecuted = false;
+    private final static String log_tag = "Settings";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,6 +177,30 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class GeneralPreferenceFragment extends PreferenceFragment {
+        private class UpdateTask extends AsyncTask<Void, Void, Void> {
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (isExecuted)
+                    return null;
+                isExecuted = true;
+                Log.d(log_tag, "Started immidiate update");
+                SetWallPaper.getSetWallPaper().updateWallPaperImage();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void avoid) {
+
+                isExecuted = false;
+
+                //Toast t = Toast.makeText(getApplicationContext(), "WallPaper updated", Toast.LENGTH_LONG);
+//                t.show();
+
+
+            }
+
+        }
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -178,6 +213,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             Preference preference = findPreference(getString(R.string.update_freq_list));
             bindPreferenceSummaryToValue(preference);
+
+            Preference button = findPreference(getString(R.string.updateButtonKey));
+            button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new UpdateTask().execute();
+                    return true;
+                }
+            });
         }
 
         @Override
@@ -190,8 +234,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return super.onOptionsItemSelected(item);
         }
     }
-
-
 
 
 }
