@@ -183,7 +183,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 if (isExecuted)
                     return null;
                 isExecuted = true;
-                Log.d(log_tag, "Started immidiate update");
+                Log.d(log_tag, "Started immediate update");
                 SetWallPaper.getSetWallPaper().updateWallPaperImage();
                 return null;
             }
