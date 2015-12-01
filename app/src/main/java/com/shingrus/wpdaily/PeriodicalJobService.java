@@ -21,7 +21,7 @@ import java.net.URLConnection;
  */
 public class PeriodicalJobService extends JobService {
 
-    private static String _log_tag = "WPJobService";
+    private static String _log_tag = "WPD/WPJobService";
     JobParameters params;
     JobTask jobTask;
     private class JobTask extends AsyncTask<Void, Void, Void> {

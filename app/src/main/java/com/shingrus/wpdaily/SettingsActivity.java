@@ -125,7 +125,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
     private static Boolean isExecuted = false;
-    private final static String log_tag = "Settings";
+    private final static String log_tag = "WPD/Settings";
 
 
     @Override
@@ -190,13 +190,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             @Override
             protected void onPostExecute(Void avoid) {
-
                 isExecuted = false;
-
-                //Toast t = Toast.makeText(getApplicationContext(), "WallPaper updated", Toast.LENGTH_LONG);
-//                t.show();
-
-
             }
 
         }

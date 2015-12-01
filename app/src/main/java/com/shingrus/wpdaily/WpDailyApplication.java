@@ -21,8 +21,8 @@ import java.net.URL;
 public class WpDailyApplication extends Application {
     //Intent myIntentService;
     private static final int JOB_ID = 0x1000;
-    private static final String _log_tag = "WP_APP";
-    private static final int DEFAULT_UPDATE_FREQUENCY_H = 24*60;
+    private static final String _log_tag = "WPD/WP_APP";
+    private static final int DEFAULT_UPDATE_FREQUENCY_H = 24 * 60;
 
     SetWallPaper setWallPaper;
 
@@ -52,7 +52,6 @@ public class WpDailyApplication extends Application {
 
 
     /**
-     *
      * @param freq Integer - minutes
      */
     private void startJob(Integer freq) {
@@ -78,12 +77,13 @@ public class WpDailyApplication extends Application {
         setWallPaper = SetWallPaper.getSetWallPaper(this);
 
         //update on start
-
+        Log.i(_log_tag, "Start application");
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String freq = pref.getString(freqKey, "360");
 
         //start background job
         startJob(Integer.parseInt(freq));
+        //startJob(1);
         pref.registerOnSharedPreferenceChangeListener(listener);
 
 
