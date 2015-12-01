@@ -30,6 +30,12 @@
         android:positiveButtonText="@null"
         android:title="@string/pref_title_sync_frequency" />
 
+    <SwitchPreference
+        android:title="@string/OnBootCheckBoxName"
+        android:key="@string/onBootEnabledKey"
+        android:defaultValue="false"
+        />
+
     <Preference  android:key="@string/updateButtonKey" android:title="@string/updateButtonLabel"/>
 
 

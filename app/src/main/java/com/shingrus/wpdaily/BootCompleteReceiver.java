@@ -15,11 +15,16 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     private final static String _log_tag = "WPD/BootReciever";
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context ctx, Intent intent) {
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             //Do nothing, looks like job started
 
-            Log.d(_log_tag, "Recieve reboot broadcast, starting job:");
+            Log.d(_log_tag, "Recieve reboot broadcast");
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ctx);
+            Boolean onBootEnabled = pref.getBoolean(ctx.getString(R.string.onBootEnabledKey), false);
+            if (onBootEnabled) {
+                PeriodicalJobService.startJobfromPreferences(ctx,pref);
+            }
 
         }
     }

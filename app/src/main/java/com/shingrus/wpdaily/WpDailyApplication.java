@@ -20,7 +20,6 @@ import java.net.URL;
  */
 public class WpDailyApplication extends Application {
     //Intent myIntentService;
-    private static final int JOB_ID = 0x1000;
     private static final String _log_tag = "WPD/WP_APP";
     private static final int DEFAULT_UPDATE_FREQUENCY_H = 24 * 60;
 
@@ -31,60 +30,34 @@ public class WpDailyApplication extends Application {
 
     }
 
-    private String freqKey = "";
+//
+//    private SharedPreferences.OnSharedPreferenceChangeListener listener =
+//            new SharedPreferences.OnSharedPreferenceChangeListener() {
+//
+//                // listener implementation
+//                public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
+//
+//                    if (key.equals(freqKey)) {
+//                        //our key changed
+//                        String freq = pref.getString(freqKey, "360");
+//
+//                        //restart background job
+//                        startJob(Integer.parseInt(freq));
+//                    }
+//
+//                }
+//            };
 
-    private SharedPreferences.OnSharedPreferenceChangeListener listener =
-            new SharedPreferences.OnSharedPreferenceChangeListener() {
 
-                // listener implementation
-                public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
-
-                    if (key.equals(freqKey)) {
-                        //our key changed
-                        String freq = pref.getString(freqKey, "360");
-
-                        //restart background job
-                        startJob(Integer.parseInt(freq));
-                    }
-
-                }
-            };
-
-
-    /**
-     * @param freq Integer - minutes
-     */
-    private void startJob(Integer freq) {
-        JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        scheduler.cancel(JOB_ID);
-        if (freq > 0) {
-            JobInfo job = new JobInfo.Builder(JOB_ID, new ComponentName(this, PeriodicalJobService.class))
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                    .setMinimumLatency(freq * 60 * 1000)
-                    .setRequiresCharging(false)
-                    .build();
-            scheduler.schedule(job);
-            Log.d(_log_tag, "Put job with freq: " + freq);
-        }
-
-    }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        freqKey = getString(R.string.update_freq_list);
         setWallPaper = SetWallPaper.getSetWallPaper(this);
 
         //update on start
         Log.i(_log_tag, "Start application");
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        String freq = pref.getString(freqKey, "360");
-
-        //start background job
-        startJob(Integer.parseInt(freq));
-        //startJob(1);
-        pref.registerOnSharedPreferenceChangeListener(listener);
 
 
     }

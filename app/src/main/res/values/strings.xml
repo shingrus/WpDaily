@@ -48,4 +48,6 @@
     <string name="update_freq_list">upadate_freq_list</string>
     <string name="updateButtonLabel">Update Wallpaper</string>
     <string name="updateButtonKey">updatebutton</string>
+    <string name="OnBootCheckBoxName">Starting update after reboot</string>
+    <string name="onBootEnabledKey">onBootEnabled</string>
 </resources>

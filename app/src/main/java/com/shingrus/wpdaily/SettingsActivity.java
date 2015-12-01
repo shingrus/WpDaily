@@ -4,6 +4,7 @@ package com.shingrus.wpdaily;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -40,6 +41,11 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+
+    static String updateFreqKey = "";
+    static String onBootEnabledKey = "";
+    static boolean onBootEnabled = false;
+
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -49,18 +55,26 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
-
+            Log.d(log_tag, "Pref changed");
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
                 ListPreference listPreference = (ListPreference) preference;
                 int index = listPreference.findIndexOfValue(stringValue);
 
+
+                if (!stringValue.equals(listPreference.getValue()) && listPreference.getKey().equals(updateFreqKey)) {
+
+                    //start job
+                    PeriodicalJobService.startJob(Integer.parseInt(stringValue), preference.getContext().getApplicationContext());
+                }
+
                 // Set the summary to reflect the new value.
                 preference.setSummary(
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
+
 
             } else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
@@ -85,9 +99,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
 
             } else {
+//                if (preference.getKey().equals(onBootEnabledKey)) {
+//                    if (stringValue.equals("true") ..) {
+//
+//                    }
+//                }
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
+
             }
             return true;
         }
@@ -132,6 +152,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+        Context ctx = getApplicationContext();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ctx);
+        onBootEnabled = pref.getBoolean(ctx.getString(R.string.onBootEnabledKey), false);
+        if (onBootEnabled) {
+            PeriodicalJobService.startJobfromPreferences(ctx, pref);
+        }
     }
 
     /**
@@ -205,7 +231,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            Preference preference = findPreference(getString(R.string.update_freq_list));
+            if (updateFreqKey.isEmpty())
+                updateFreqKey = getString(R.string.update_freq_list);
+            if (onBootEnabledKey.isEmpty())
+                onBootEnabledKey = getString(R.string.onBootEnabledKey);
+            Preference preference = findPreference(updateFreqKey);
             bindPreferenceSummaryToValue(preference);
 
             Preference button = findPreference(getString(R.string.updateButtonKey));
