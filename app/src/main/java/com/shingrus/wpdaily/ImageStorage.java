@@ -6,9 +6,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
-import java.util.ArrayList;
 
 /**
+ *
+ * Image storage - Singleton object, has all necessary methods for database access
  * Created by shingrus on 06/12/15.
  */
 public class ImageStorage {
@@ -22,20 +23,20 @@ public class ImageStorage {
     public static final String IMAGES_COLUMN_PROVIDER = "provider";
     private static final String IMAGES_LAST_IMAGES_LIMIT = "10";
     static final String CREATE_IMAGES_TABLE =   "CREATE TABLE '"+ IMAGES_TABLE_NAME +"' (" +
-            "'_id INTEGER PRIMARY KEY AUTOINCREMENT "+
+            "'_id' INTEGER PRIMARY KEY AUTOINCREMENT,"+
             "'url' TEXT UNIQ, " +
             "'inserted_at' INTEGER default (strftime('%s','now'))," +
             "'provider' TEXT default ''," +
-            "'image' BLOB,"+
-            "CREATE UNIQ INDEX url_index on (url))";
+            "'image' BLOB"+
+            ")";
 
 
     private static ImageStorage sInstance;
-    private static Context ctx;
+    private Context ctx;
 
 
     private ImageStorage(Context context) {
-        this.ctx = context;
+        ctx = context;
 
     }
 
@@ -45,7 +46,7 @@ public class ImageStorage {
             IMAGES_COLUMN_URL+","+IMAGES_COLUMN_PROVIDER+","+IMAGES_COLUMN_IMAGE+") VALUES(?,?,?)";
     public void putImage (String url, String provider, byte[] buffer) {
         //put image with now date
-        ImageDBHelper dbHelper = new ImageDBHelper(this.ctx);
+        ImageDBHelper dbHelper = new ImageDBHelper(ctx);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if ( db != null) {
             SQLiteStatement insertStmt      =   db.compileStatement(INSERT_IMAGE_STMNT);
@@ -61,14 +62,12 @@ public class ImageStorage {
 
     /**
      *
-     * @param
      * @return ArrayList<Image> - array list of images
      */
     public Cursor getLastImagesCursor() {
-        ArrayList<Image> resultArray = new ArrayList<>();
         SQLiteDatabase db = new ImageDBHelper(this.ctx).getReadableDatabase();
 
-        Cursor c = db.query(IMAGES_TABLE_NAME,
+        return db.query(IMAGES_TABLE_NAME,
                 new String[]{IMAGES_COLUMN_IMAGE, IMAGES_COLUMN_DATE_INSERTED, IMAGES_COLUMN_URL, IMAGES_COLUMN_ID},
                 IMAGES_COLUMN_DATE_INSERTED + "> ?",
                 new String[]{"0"},
@@ -76,7 +75,7 @@ public class ImageStorage {
                 null,
                 IMAGES_COLUMN_DATE_INSERTED + " desc",
                 IMAGES_LAST_IMAGES_LIMIT);
-        return c;
+
     }
 
     private class ImageDBHelper extends SQLiteOpenHelper {
@@ -90,7 +89,7 @@ public class ImageStorage {
         }
 
         @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        public synchronized void  onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (oldVersion ==1 && newVersion == 2) {
                 db.execSQL("DROP TABLE IF EXISTS Images");
                 this.onCreate(db);

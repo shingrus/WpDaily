@@ -30,6 +30,8 @@ public class PeriodicalJobService extends JobService {
     JobParameters params;
     JobTask jobTask;
 
+    private static Integer frequency=0;
+
     private static final int JOB_ID = 0x1000;
 
     private class JobTask extends AsyncTask<Void, Void, Void> {
@@ -52,12 +54,11 @@ public class PeriodicalJobService extends JobService {
         @Override
         protected void onPostExecute(Void avoid) {
 
+            //good place to restart job
             jobFinished(params, true);
         }
 
     }
-
-    //JobTask jobTask = new JobTask(this);
 
     @Override
     public boolean onStartJob(JobParameters params) {
@@ -69,11 +70,9 @@ public class PeriodicalJobService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-
         Log.d(_log_tag, "Job finished");
         return true;
     }
-
 
 
 

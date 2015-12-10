@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Xml;
@@ -14,6 +12,7 @@ import android.util.Xml;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -31,56 +30,76 @@ public final class SetWallPaper {
     static SetWallPaper setWallPaper;
     static final String _log_tag = "SetWallPaper";
 
-    private static String whereGetImages = "http://feeds.nationalgeographic.com/ng/photography/photo-of-the-day?format=xml";
-    private static String MagicURLReplacementFrom = "360x270";
-    private static String MagicURLReplacementTo = "990x742";
+    private static final String whereGetImages = "http://feeds.nationalgeographic.com/ng/photography/photo-of-the-day?format=xml";
+    private static final String MagicURLReplacementFrom = "360x270";
+    private static final String MagicURLReplacementTo = "990x742";
+    private static final String PROVIDER = "National Geographic";
 
-    private static String LAST_IMAGE_URL_KEY = "last_image_url";
+    private static final String LAST_IMAGE_URL_KEY = "last_image_url";
 
 
     private SetWallPaper(Context ctx) {
         this.appContext = ctx;
     }
 
-    public static synchronized  SetWallPaper getSetWallPaper(Context ctx) {
+    public static synchronized SetWallPaper getSetWallPaper(Context ctx) {
         if (ctx != null && setWallPaper == null) {
             setWallPaper = new SetWallPaper(ctx);
         }
         return setWallPaper;
     }
 
-    public static  synchronized SetWallPaper getSetWallPaper() {
+    public static synchronized SetWallPaper getSetWallPaper() {
         return setWallPaper;
     }
 
 
-    private Bitmap getImage(URL url) {
+    private byte[] getImage(URL url) {
 
-        //TODO: check for cached images
-        Bitmap bmp = null;
+        byte[] retVal = null;
         if (url != null) {
             try {
                 URLConnection conn = url.openConnection();
                 InputStream in = conn.getInputStream();
-                bmp = BitmapFactory.decodeStream(in);
+                int contentLength = conn.getContentLength();
+                ByteArrayOutputStream baos;
+                if (contentLength != -1) {
+                    baos = new ByteArrayOutputStream(contentLength);
+                } else {
+                    baos = new ByteArrayOutputStream((1024 + 512) * 1024); //1.5 Mb
+                }
+
+                //use here byte buffer
+                int count;
+                byte[] buf = new byte[100 * 1024];
+                while ((count = in.read(buf)) != -1) {
+                    baos.write(buf, 0, count);
+                }
+
+                in.close();
+
+                retVal = baos.toByteArray();
+
+                //bmp = BitmapFactory.decodeByteArray(baos.toByteArray(),0,baos.size());
+
 
             } catch (IOException e) {
                 Log.d(_log_tag, "Can't connect to " + url);
             }
         }
-        return bmp;
+        return retVal;
     }
 
     /**
-     *
-     * @param image - Bitmap image, that should be set as WP
+     * @param buffer - Buffer with image, that should be set as WP
      * @return true if success, false - overvise
      */
-    private boolean setWallPaperImage(Bitmap image) {
+    private boolean setWallPaperImage(byte[] buffer) {
         boolean retVal = false;
-        if (image != null) {
+        if (buffer != null) {
             WallpaperManager wp = WallpaperManager.getInstance(appContext);
             try {
+                Bitmap image = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
                 wp.setBitmap(image);
                 retVal = true;
             } catch (IOException e) {
@@ -94,16 +113,23 @@ public final class SetWallPaper {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         String lastUrl = preferences.getString(LAST_IMAGE_URL_KEY, "");
         if (!lastUrl.equals(url.toString())) {
-            if(setWallPaperImage(getImage(url))) {
+
+            byte[] imageBuf = getImage(url);
+            if (setWallPaperImage(imageBuf)) {
                 Log.d(_log_tag, "Set new image:" + url);
+
+                //store Image
+                ImageStorage storage = ImageStorage.getInstance(appContext);
+                storage.putImage(url.toString(), PROVIDER, imageBuf);
 
                 SharedPreferences.Editor e = preferences.edit();
                 e.putString(LAST_IMAGE_URL_KEY, url.toString());
                 e.apply();
+
+
             }
-        }
-        else
-            Log.d(_log_tag, "We already set this image: "+url);
+        } else
+            Log.d(_log_tag, "We already set this image: " + url);
 
     }
 
@@ -129,8 +155,8 @@ public final class SetWallPaper {
                 connection = listOfImages.openConnection();
                 if ((connection instanceof HttpURLConnection)) {
                     HttpURLConnection httpcon = (HttpURLConnection) connection;
-                    httpcon.setReadTimeout(10000 /* milliseconds */);
-                    httpcon.setConnectTimeout(15000 /* milliseconds */);
+                    httpcon.setReadTimeout(15000 /* milliseconds */);
+                    httpcon.setConnectTimeout(10000 /* milliseconds */);
                     httpcon.setDoInput(true);
                     httpcon.connect();
                     int responseCode = httpcon.getResponseCode();
@@ -147,18 +173,17 @@ public final class SetWallPaper {
                                 boolean insideItem = false; //here is some magic
 
 
-                                while (parser.next() != XmlPullParser.END_DOCUMENT){
+                                while (parser.next() != XmlPullParser.END_DOCUMENT) {
                                     int event = parser.getEventType();
                                     if (event == XmlPullParser.START_TAG) {
                                         String name = parser.getName();
                                         if (name.equals("item")) {
                                             Log.d("XML", "Found item, go deeper");
                                             insideItem = true;
-                                        }
-                                        else if (insideItem && name.contentEquals("enclosure")) {
+                                        } else if (insideItem && name.contentEquals("enclosure")) {
                                             String xmlAttr = parser.getAttributeValue(null, "url");
                                             if (xmlAttr != null) {
-                                                String newUrl = xmlAttr.replace(MagicURLReplacementFrom,MagicURLReplacementTo);
+                                                String newUrl = xmlAttr.replace(MagicURLReplacementFrom, MagicURLReplacementTo);
                                                 retrunValue = new URL(newUrl);
 
                                             }
@@ -183,7 +208,7 @@ public final class SetWallPaper {
 
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                e.  printStackTrace();
             }
 
 

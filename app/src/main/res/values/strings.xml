@@ -50,4 +50,5 @@
     <string name="updateButtonKey">updatebutton</string>
     <string name="OnBootCheckBoxName">Starting update after reboot</string>
     <string name="onBootEnabledKey">onBootEnabled</string>
+    <string name="action_settings">Settings</string>
 </resources>

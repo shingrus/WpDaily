@@ -24,6 +24,7 @@ public class WpDailyApplication extends Application {
     private static final int DEFAULT_UPDATE_FREQUENCY_H = 24 * 60;
 
     SetWallPaper setWallPaper;
+    ImageStorage storage;
 
     public WpDailyApplication() {
         super();
@@ -55,6 +56,7 @@ public class WpDailyApplication extends Application {
         super.onCreate();
 
         setWallPaper = SetWallPaper.getSetWallPaper(this);
+        storage = ImageStorage.getInstance(this);
 
         //update on start
         Log.i(_log_tag, "Start application");
