@@ -44,21 +44,22 @@ public class ImageStorage {
 
     static final String INSERT_IMAGE_STMNT  =   "INSERT INTO " + IMAGES_TABLE_NAME + " ("+
             IMAGES_COLUMN_URL+","+IMAGES_COLUMN_PROVIDER+","+IMAGES_COLUMN_IMAGE+") VALUES(?,?,?)";
+    //
     public void putImage (String url, String provider, byte[] buffer) {
         //put image with now date
         ImageDBHelper dbHelper = new ImageDBHelper(ctx);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if ( db != null) {
             SQLiteStatement insertStmt      =   db.compileStatement(INSERT_IMAGE_STMNT);
-            insertStmt.bindString(1,url);
+            insertStmt.bindString(1, url);
             insertStmt.bindString(2, provider);
             insertStmt.bindBlob(3, buffer);
-
-            insertStmt.executeInsert();
             insertStmt.clearBindings();
         }
 
     }
+
+
 
     /**
      *

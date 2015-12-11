@@ -3,6 +3,7 @@ package com.shingrus.wpdaily;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,15 +20,18 @@ import java.util.Date;
  */
 public class ImageCursorAdapter  extends CursorAdapter{
     DateFormat df;
+    LayoutInflater inflater;
+    private static final String _log_tag = "WPD/ImageCursor";
+
     public ImageCursorAdapter(Context context, Cursor c) {
         super(context, c, 0);
+        inflater = LayoutInflater.from(context);
         df = DateFormat.getDateInstance();
 
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        LayoutInflater inflater = LayoutInflater.from(context);
         return inflater.inflate(R.layout.item_layout, null, false);
 
     }
@@ -44,6 +48,6 @@ public class ImageCursorAdapter  extends CursorAdapter{
         iv.setImageBitmap(BitmapFactory.decodeByteArray(image,0,image.length));
 
         tv.setText(df.format(new Date(longdate)));
-
+        Log.d(_log_tag, "bind view");
     }
 }
