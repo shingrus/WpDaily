@@ -64,6 +64,35 @@ public class ImageStorage {
 
     /**
      *
+     * @param id - int, Image id
+     * @return Image object
+     */
+    public Image getImageById(long id) {
+        Image retImage = null;
+        SQLiteDatabase db = new ImageDBHelper(this.ctx).getReadableDatabase();
+        String where = Long.toString(id);
+        Cursor c = db.query(IMAGES_TABLE_NAME,
+                new String[]{IMAGES_COLUMN_IMAGE, IMAGES_COLUMN_DATE_INSERTED,
+                        IMAGES_COLUMN_URL, IMAGES_COLUMN_PROVIDER},
+                IMAGES_COLUMN_ID + " = ?",
+                new String[]{where},
+                null,
+                null,
+                null
+        );
+        if (c.moveToNext()) {
+
+            byte[] b = c.getBlob(0);
+            if (b !=null){
+                retImage =
+                        new Image(c.getString(2),c.getInt(1),c.getString(3),b);
+            }
+        }
+        return retImage;
+    }
+
+    /**
+     *
      * @return ArrayList<Image> - array list of images
      */
     public Cursor getLastImagesCursor() {

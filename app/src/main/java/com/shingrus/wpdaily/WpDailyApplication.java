@@ -31,25 +31,6 @@ public class WpDailyApplication extends Application {
 
     }
 
-//
-//    private SharedPreferences.OnSharedPreferenceChangeListener listener =
-//            new SharedPreferences.OnSharedPreferenceChangeListener() {
-//
-//                // listener implementation
-//                public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
-//
-//                    if (key.equals(freqKey)) {
-//                        //our key changed
-//                        String freq = pref.getString(freqKey, "360");
-//
-//                        //restart background job
-//                        startJob(Integer.parseInt(freq));
-//                    }
-//
-//                }
-//            };
-
-
 
     @Override
     public void onCreate() {
