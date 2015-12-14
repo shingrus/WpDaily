@@ -42,6 +42,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ShowImage"
+            android:label="@string/ShowImageTitle"
+            android:parentActivityName=".WPDMainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.shingrus.wpdaily.WPDMainActivity" />
+        </activity>
     </application>
 
 </manifest>
