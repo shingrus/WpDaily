@@ -21,7 +21,7 @@ import java.net.URL;
 public class WpDailyApplication extends Application {
     //Intent myIntentService;
     private static final String _log_tag = "WPD/WP_APP";
-    private static final int DEFAULT_UPDATE_FREQUENCY_H = 24 * 60;
+    private static final int DEFAULT_UPDATE_FREQUENCY_H = 6 * 60;
 
     SetWallPaper setWallPaper;
     ImageStorage storage;
