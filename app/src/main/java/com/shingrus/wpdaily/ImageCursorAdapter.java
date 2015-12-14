@@ -40,14 +40,16 @@ public class ImageCursorAdapter  extends CursorAdapter{
     public void bindView(View view, Context ctx, Cursor c) {
         ImageView iv= (ImageView) view.findViewById(R.id.ItemImageId);
         TextView tv = (TextView) view.findViewById(R.id.ItemDateId);
-
-        int date = c.getInt(c.getColumnIndex(ImageStorage.IMAGES_COLUMN_DATE_INSERTED));
-        long longdate = (long)date *1000;
-
         byte[] image = c.getBlob(c.getColumnIndex(ImageStorage.IMAGES_COLUMN_IMAGE));
-        iv.setImageBitmap(BitmapFactory.decodeByteArray(image,0,image.length));
+        if (image != null && image.length > 0) {
+            int date = c.getInt(c.getColumnIndex(ImageStorage.IMAGES_COLUMN_DATE_INSERTED));
+            long longdate = (long) date * 1000;
 
-        tv.setText(df.format(new Date(longdate)));
+
+            iv.setImageBitmap(BitmapFactory.decodeByteArray(image, 0, image.length));
+
+            tv.setText(df.format(new Date(longdate)));
+        }
         Log.d(_log_tag, "bind view");
     }
 }

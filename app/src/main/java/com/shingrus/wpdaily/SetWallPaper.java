@@ -109,7 +109,14 @@ public final class SetWallPaper {
         return retVal;
     }
 
-    private void setWallPaperImage(URL url) {
+
+    /**
+     *
+     * @param url - url where to get  new image
+     * @return true if new image found, false - if not
+     */
+    private boolean setWallPaperImage(URL url) {
+        boolean retVal = false;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         String lastUrl = preferences.getString(LAST_IMAGE_URL_KEY, "");
         if (!lastUrl.equals(url.toString())) {
@@ -125,20 +132,17 @@ public final class SetWallPaper {
                 SharedPreferences.Editor e = preferences.edit();
                 e.putString(LAST_IMAGE_URL_KEY, url.toString());
                 e.apply();
-
-
+                retVal = true;
             }
         } else
             Log.d(_log_tag, "We already set this image: " + url);
+        return retVal;
 
     }
 
-    public void updateWallPaperImage() {
+    public boolean updateWallPaperImage() {
         URL imageUrl = setWallPaper.GetLastWallpaperLink();
-        if (imageUrl != null) {
-            setWallPaperImage(imageUrl);
-        }
-
+        return imageUrl != null && setWallPaperImage(imageUrl);
     }
 
     /**

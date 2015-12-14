@@ -21,6 +21,7 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private static final String _log_tag = "WPD/WPDMainActivity";
     private static boolean isUpdating = false;
+    private ImageCursorAdapter imageCursorAdapter = null;
 
     /**
      * Implements OnRefreshListener
@@ -35,7 +36,7 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
     }
 
 
-    class UpdateImages extends AsyncTask<Void, Void, Void> {
+    class UpdateImages extends AsyncTask<Void, Void, Boolean> {
 
         @Override
         protected void onPreExecute() {
@@ -44,17 +45,19 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Boolean doInBackground(Void... params) {
+            boolean retVal = false;
             SetWallPaper setWallPaper = SetWallPaper.getSetWallPaper();
-            setWallPaper.updateWallPaperImage();
-            return null;
+            return  setWallPaper.updateWallPaperImage();
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(Boolean hasnewImages) {
             isUpdating = false;
             mSwipeRefreshLayout.setRefreshing(false);
-            new GetImagesFromStorage().execute(null, null, null);
+            if (hasnewImages) {
+                new GetImagesFromStorage().execute(null, null, null);
+            }
 
         }
 
@@ -70,14 +73,12 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 
         @Override
         protected void onPostExecute(Cursor c) {
-            ListView listView = (ListView) findViewById(R.id.images_list);
-            listView.setAdapter(new ImageCursorAdapter(WPDMainActivity.this, c));
+
+            if (imageCursorAdapter != null) {
+                imageCursorAdapter.changeCursor(c);
+            }
         }
 
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
     }
 
 
@@ -105,7 +106,9 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         setContentView(R.layout.activity_main);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-
+        ListView listView = (ListView) findViewById(R.id.images_list);
+        imageCursorAdapter = new ImageCursorAdapter(WPDMainActivity.this, null);
+        listView.setAdapter(imageCursorAdapter);
 //        mSwipeRefreshLayout.setColorScheme(R.color.blue, R.color.green, R.color.yellow, R.color.red);
 
 //        ListView lv = (ListView) findViewById(R.id.images_list);
@@ -118,4 +121,10 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 
     }
 
+    @Override
+    protected void onDestroy() {
+        imageCursorAdapter.changeCursor(null);
+        super.onDestroy();
+        Log.d(_log_tag, "Destroy main activity");
+    }
 }
