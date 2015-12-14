@@ -7,6 +7,9 @@ public final class Image {
     private final Integer insertedAt;
 
 
+    private final String provider;
+
+
     public final Integer getInsertedAt() {
         return insertedAt;
     }
@@ -19,11 +22,15 @@ public final class Image {
         return data;
     }
 
+    public final String getProvider() {
+        return provider;
+    }
 
 
-    public Image(String url, Integer insertedAt, byte[] data) {
+    public Image(String url, Integer insertedAt, String provider, byte[] data) {
         this.data = data;
         this.url = url;
         this.insertedAt = insertedAt;
+        this.provider = provider;
     }
 }
