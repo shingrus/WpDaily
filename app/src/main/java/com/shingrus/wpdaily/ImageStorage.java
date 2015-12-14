@@ -54,6 +54,7 @@ public class ImageStorage {
             insertStmt.bindString(1, url);
             insertStmt.bindString(2, provider);
             insertStmt.bindBlob(3, buffer);
+            insertStmt.execute();
             insertStmt.clearBindings();
         }
 
@@ -87,6 +88,19 @@ public class ImageStorage {
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(CREATE_IMAGES_TABLE);
+
+            //DEBUG
+            if (BuildConfig.DEBUG) {
+                for (int i = 0; i< 50; i++) {
+
+                    SQLiteStatement insertStmt = db.compileStatement(INSERT_IMAGE_STMNT);
+                    insertStmt.bindString(1, "url:"+i);
+                    insertStmt.bindString(2, "Test Provider");
+                    insertStmt.bindBlob(3, null);
+                    insertStmt.execute();
+                    insertStmt.clearBindings();
+                }
+            }
         }
 
         @Override
