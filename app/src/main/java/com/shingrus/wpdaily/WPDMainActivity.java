@@ -2,7 +2,6 @@ package com.shingrus.wpdaily;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.audiofx.BassBoost;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -12,8 +11,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toolbar;
 
 public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -109,6 +109,16 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         ListView listView = (ListView) findViewById(R.id.images_list);
         imageCursorAdapter = new ImageCursorAdapter(WPDMainActivity.this, null);
         listView.setAdapter(imageCursorAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(_log_tag, "Click on : "+ id);
+                Intent intent = new Intent(WPDMainActivity.this, ShowImage.class);
+                intent.putExtra(ShowImage.IMAGE_ID_KEY,id);
+                startActivity(intent);
+            }
+        });
+
 //        mSwipeRefreshLayout.setColorScheme(R.color.blue, R.color.green, R.color.yellow, R.color.red);
 
 //        ListView lv = (ListView) findViewById(R.id.images_list);
