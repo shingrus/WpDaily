@@ -109,19 +109,22 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         ListView listView = (ListView) findViewById(R.id.images_list);
         imageCursorAdapter = new ImageCursorAdapter(WPDMainActivity.this, null);
         listView.setAdapter(imageCursorAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(_log_tag, "Click on : "+ id);
-                Intent intent = new Intent(WPDMainActivity.this, ShowImage.class);
-                intent.putExtra(ShowImage.IMAGE_ID_KEY,id);
-                startActivity(intent);
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                return false;
             }
         });
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Log.d(_log_tag, "Click on : "+ id);
+//                Intent intent = new Intent(WPDMainActivity.this, ShowImage.class);
+//                intent.putExtra(ShowImage.IMAGE_ID_KEY,id);
+//                startActivity(intent);
+//            }
+//        });
 
-//        mSwipeRefreshLayout.setColorScheme(R.color.blue, R.color.green, R.color.yellow, R.color.red);
-
-//        ListView lv = (ListView) findViewById(R.id.images_list);
 
         //start update
         new UpdateImages().execute(null, null, null);
