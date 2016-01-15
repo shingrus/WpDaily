@@ -39,6 +39,12 @@ public class WpDailyApplication extends Application {
         setWallPaper = SetWallPaper.getSetWallPaper(this);
         storage = ImageStorage.getInstance(this);
 
+        //
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isAutomaticUpdateEnable = pref.getBoolean(this.getString(R.string.AutomaticUpdateEnabledKey),true);
+        if (isAutomaticUpdateEnable)
+            WPUpdateService.restartJobfromPreferences(this, pref);
+
         //update on start
         Log.i(_log_tag, "Start application");
 

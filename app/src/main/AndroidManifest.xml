@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".WpDailyApplication"
@@ -22,18 +23,23 @@
             </intent-filter-->
         </activity>
         <!-- service android:name=".SetWpService" android:exported="false" / -->
-        <service
-            android:name=".PeriodicalJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <receiver android:name=".BootCompleteReceiver">
+        <service
+            android:name=".WPUpdateService"
+            android:exported="false" />
+
+        <receiver android:name=".BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".WPAlarmReciever"
+            android:process=":remote">
+
+        </receiver>
+
 
         <activity android:name=".WPDMainActivity">
             <intent-filter>

@@ -76,7 +76,7 @@ public class PeriodicalJobService extends JobService {
 
 
 
-    public static void startJobfromPreferences(Context ctx, SharedPreferences pref) {
+    private static void startJobfromPreferences(Context ctx, SharedPreferences pref) {
         String freqKey = ctx.getString(R.string.update_freq_list);
         String freq = pref.getString(freqKey, "360");
         startJob(Integer.parseInt(freq), ctx);

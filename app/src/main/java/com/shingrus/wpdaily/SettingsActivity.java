@@ -152,12 +152,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
-        Context ctx = getApplicationContext();
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ctx);
-        onBootEnabled = pref.getBoolean(ctx.getString(R.string.onBootEnabledKey), false);
-        if (onBootEnabled) {
-            PeriodicalJobService.startJobfromPreferences(ctx, pref);
-        }
+//        Context ctx = getApplicationContext();
+//        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ctx);
+//        onBootEnabled = pref.getBoolean(ctx.getString(R.string.onBootEnabledKey), false);
+//        if (onBootEnabled) {
+//            PeriodicalJobService.startJobfromPreferences(ctx, pref);
+//        }
     }
 
     /**

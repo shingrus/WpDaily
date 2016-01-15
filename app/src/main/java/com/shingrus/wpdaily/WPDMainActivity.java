@@ -115,6 +115,8 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
                 return false;
             }
         });
+        registerForContextMenu(listView);
+
 //        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -126,11 +128,10 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 //        });
 
 
-        //start update
-        new UpdateImages().execute(null, null, null);
-//        getLoaderManager().initLoader(GET_IMAGES,null, this);
         //Load images
         new GetImagesFromStorage().execute(null, null, null);
+        //start update
+        new UpdateImages().execute(null, null, null);
 
     }
 
