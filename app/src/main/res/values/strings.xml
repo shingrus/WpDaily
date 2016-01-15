@@ -52,4 +52,8 @@
     <string name="onBootEnabledKey">onBootEnabled</string>
     <string name="action_settings">Settings</string>
     <string name="ShowImageTitle" />
+    <string name="share_menuitem">Share</string>
+    <string name="setwp_menuitem">Set as Wallpaper</string>
+    <string name="AutomaticUpdateEnableCheckBoxName">Automatically update Wallpaper</string>
+    <string name="AutomaticUpdateEnabledKey">automaticUpdateEnabled</string>
 </resources>

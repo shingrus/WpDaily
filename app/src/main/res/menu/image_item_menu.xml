@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/share_action"
+        android:title="@string/share_menuitem" />
+    <item
+        android:id="@+id/setwp_menu_action"
+        android:title="@string/setwp_menuitem" />
+
+</menu>
