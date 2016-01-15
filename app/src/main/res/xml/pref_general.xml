@@ -35,6 +35,12 @@
         android:key="@string/onBootEnabledKey"
         android:defaultValue="false"
         />
+    <SwitchPreference
+        android:title="@string/AutomaticUpdateEnableCheckBoxName"
+        android:key="@string/AutomaticUpdateEnabledKey"
+        android:defaultValue="true"
+        />
+
 
     <Preference  android:key="@string/updateButtonKey" android:title="@string/updateButtonLabel"/>
 
