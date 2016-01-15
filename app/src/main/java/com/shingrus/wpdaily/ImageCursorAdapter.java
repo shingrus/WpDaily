@@ -2,6 +2,7 @@ package com.shingrus.wpdaily;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +19,7 @@ import java.util.Date;
  * CursorAdapter for MainListView
  * Created by shingrus on 09/12/15.
  */
-public class ImageCursorAdapter  extends CursorAdapter{
+public class ImageCursorAdapter extends CursorAdapter {
     DateFormat df;
     LayoutInflater inflater;
     private static final String _log_tag = "WPD/ImageCursor";
@@ -38,15 +39,17 @@ public class ImageCursorAdapter  extends CursorAdapter{
 
     @Override
     public void bindView(View view, Context ctx, Cursor c) {
-        ImageView iv= (ImageView) view.findViewById(R.id.ItemImageId);
+        ImageView iv = (ImageView) view.findViewById(R.id.ItemImageId);
+
         TextView tv = (TextView) view.findViewById(R.id.ItemDateId);
         byte[] image = c.getBlob(c.getColumnIndex(ImageStorage.IMAGES_COLUMN_IMAGE));
         if (image != null && image.length > 0) {
             int date = c.getInt(c.getColumnIndex(ImageStorage.IMAGES_COLUMN_DATE_INSERTED));
             long longdate = (long) date * 1000;
 
+            Bitmap origBitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
 
-            iv.setImageBitmap(BitmapFactory.decodeByteArray(image, 0, image.length));
+            iv.setImageBitmap(origBitmap);
 
             tv.setText(df.format(new Date(longdate)));
         }
