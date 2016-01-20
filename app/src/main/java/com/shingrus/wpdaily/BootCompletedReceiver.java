@@ -1,6 +1,5 @@
 package com.shingrus.wpdaily;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,11 +22,11 @@ public class BootCompletedReceiver extends WakefulBroadcastReceiver {
 
             Log.d(_log_tag, "Recieve reboot broadcast");
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ctx);
-            Boolean onBootEnabled = pref.getBoolean(ctx.getString(R.string.onBootEnabledKey), false);
+            Boolean onBootEnabled = pref.getBoolean(ctx.getString(R.string.onBootEnabledKey), true);
 
             if (onBootEnabled) {
                 //PeriodicalJobService.startJobfromPreferences(ctx,pref);
-                WPUpdateService.restartJobfromPreferences(ctx,pref);
+                WPUpdateService.restartJobFromPreferences(ctx, pref);
 
             }
 

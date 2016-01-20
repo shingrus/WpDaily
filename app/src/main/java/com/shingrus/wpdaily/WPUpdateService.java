@@ -22,10 +22,14 @@ public class WPUpdateService extends IntentService {
 
     private static final String _service_name = "WPUpdateService";
     private static final String _log_tag = "WPD/UpdateService";
+    public static final String UPDATE_ACTIVITY_ACTION = "com.shingrus.wpadaily.action.update_activity";
+    public static final String RESULT_EXTRA = "UpdateResult";
+
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      */
     private Context ctx = null;
+
 
     public WPUpdateService() {
         super(_service_name);
@@ -42,6 +46,7 @@ public class WPUpdateService extends IntentService {
      */
     private static void scheduleAlarm(Context ctx, long periodic) {
 
+        Log.d(_log_tag, "Schedule alarm with period: " + periodic);
         Intent intent = new Intent(ctx, WPAlarmReciever.class);
         // Create a PendingIntent to be triggered when the alarm goes off
         PendingIntent pIntent = PendingIntent.getBroadcast(ctx, 0,
@@ -53,18 +58,25 @@ public class WPUpdateService extends IntentService {
                 periodic, pIntent);
     }
 
-    public static void restartJobfromPreferences(Context ctx, SharedPreferences pref) {
-        String freqKey = ctx.getString(R.string.update_freq_list);
-        String freq = pref.getString(freqKey, "360");
-
-        long seconds = Integer.parseInt(freq) * 60;
-
-        if (BuildConfig.DEBUG)
-            seconds = 10;
-
+    private static void restartJob(Context ctx, long seconds) {
+//        if (BuildConfig.DEBUG)
+//            seconds = 10;
 
         scheduleAlarm(ctx.getApplicationContext(), seconds * 1000);
+    }
+    public static void restartJobFromPreferences(Context ctx, SharedPreferences pref) {
 
+        boolean autoUpdate = pref.getBoolean(ctx.getString(R.string.AutomaticUpdateEnabledKey), false);
+        if (autoUpdate) {
+            String freqKey = ctx.getString(R.string.update_freq_list);
+            String freq = pref.getString(freqKey, "360");
+
+            long seconds = Integer.parseInt(freq) * 60;
+
+            restartJob(ctx, seconds);
+        }
+        else
+            Log.d(_log_tag, "Autoupdate disabled. Job start refused");
     }
 
 
@@ -80,9 +92,9 @@ public class WPUpdateService extends IntentService {
     }
 
 
-    private void subscribeOnNetworkChanges( boolean subscribe ) {
+    private void subscribeOnNetworkChanges(boolean subscribe) {
 
-        Log.d(_log_tag, subscribe? "Subscribe":"Unsubscribe" );
+        Log.d(_log_tag, subscribe ? "Subscribe" : "Unsubscribe");
         ComponentName receiver = new ComponentName(ctx, NetworkBroadcastReceiver.class);
 
         PackageManager pm = ctx.getPackageManager();
@@ -93,26 +105,39 @@ public class WPUpdateService extends IntentService {
                         PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
     }
-    private void doUpdate() {
-        Log.d(_log_tag, "Doing update from service" );
+
+    private SetWallPaper.UpdateResult doUpdate() {
+
+        SetWallPaper.UpdateResult retVal = SetWallPaper.getSetWallPaper().updateWallPaperImage();
+        Log.d(_log_tag, "Doing update from service");
+
+        //Notify activity about new content
+        Intent intentForActivity = new Intent();
+        intentForActivity.setAction(UPDATE_ACTIVITY_ACTION);
+        intentForActivity.putExtra(RESULT_EXTRA, retVal);
+        sendBroadcast(intentForActivity);
+
+
+        return retVal;
     }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         String action = intent.getAction();
         Log.d(_log_tag, "Start service job");
         if (checkNetworkState()) {
-            doUpdate();
-            subscribeOnNetworkChanges(false);
-        } else {
-            subscribeOnNetworkChanges(true);
-            if (checkNetworkState()) {
-                doUpdate();
+            SetWallPaper.UpdateResult updateResult = doUpdate();
+            Log.d(_log_tag, "Update result: " + updateResult);
+
+            if (updateResult != SetWallPaper.UpdateResult.NETWORK_FAIL)  {
+                    //don't unsubscribe from network events till we have network error
                 subscribeOnNetworkChanges(false);
             }
 
+
+        } else {
+            subscribeOnNetworkChanges(true);
         }
-
-
         completeWakefulIntent(intent);
 
     }

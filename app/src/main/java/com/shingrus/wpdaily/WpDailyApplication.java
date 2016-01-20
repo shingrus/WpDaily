@@ -2,17 +2,9 @@ package com.shingrus.wpdaily;
 
 import android.app.Application;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
-
-import java.net.URL;
 
 /**
  * Created by shingrus on 22/11/15.
@@ -43,7 +35,7 @@ public class WpDailyApplication extends Application {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isAutomaticUpdateEnable = pref.getBoolean(this.getString(R.string.AutomaticUpdateEnabledKey),true);
         if (isAutomaticUpdateEnable)
-            WPUpdateService.restartJobfromPreferences(this, pref);
+            WPUpdateService.restartJobFromPreferences(this, pref);
 
         //update on start
         Log.i(_log_tag, "Start application");

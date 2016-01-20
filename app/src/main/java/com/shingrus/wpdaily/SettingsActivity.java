@@ -3,31 +3,24 @@ package com.shingrus.wpdaily;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.List;
+
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -44,7 +37,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     static String updateFreqKey = "";
     static String onBootEnabledKey = "";
-    static boolean onBootEnabled = false;
+//    static String onAutoUpdateEnableKey = "";
+//    static boolean onBootEnabled = false;
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -66,7 +60,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 if (!stringValue.equals(listPreference.getValue()) && listPreference.getKey().equals(updateFreqKey)) {
 
                     //start job
-                    PeriodicalJobService.startJob(Integer.parseInt(stringValue), preference.getContext().getApplicationContext());
+                    WPUpdateService.restartJobFromPreferences(preference.getContext(), preference.getSharedPreferences());
                 }
 
                 // Set the summary to reflect the new value.
@@ -99,13 +93,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
 
             } else {
-//                if (preference.getKey().equals(onBootEnabledKey)) {
-//                    if (stringValue.equals("true") ..) {
-//
-//                    }
-//                }
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
+                Log.d(log_tag, "Pref: " + preference + "changed to: " + value );
                 preference.setSummary(stringValue);
 
             }
@@ -144,7 +134,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
 
-    private static Boolean isExecuted = false;
     private final static String log_tag = "WPD/Settings";
 
 
@@ -152,12 +141,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
-//        Context ctx = getApplicationContext();
-//        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ctx);
-//        onBootEnabled = pref.getBoolean(ctx.getString(R.string.onBootEnabledKey), false);
-//        if (onBootEnabled) {
-//            PeriodicalJobService.startJobfromPreferences(ctx, pref);
-//        }
     }
 
     /**
@@ -203,24 +186,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class GeneralPreferenceFragment extends PreferenceFragment {
-        private class UpdateTask extends AsyncTask<Void, Void, Void> {
-            @Override
-            protected Void doInBackground(Void... params) {
-                if (isExecuted)
-                    return null;
-                isExecuted = true;
-                Log.d(log_tag, "Started immediate update");
-                SetWallPaper.getSetWallPaper().updateWallPaperImage();
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void avoid) {
-                isExecuted = false;
-            }
-
-        }
-
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -235,28 +200,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 updateFreqKey = getString(R.string.update_freq_list);
             if (onBootEnabledKey.isEmpty())
                 onBootEnabledKey = getString(R.string.onBootEnabledKey);
+
             Preference preference = findPreference(updateFreqKey);
             bindPreferenceSummaryToValue(preference);
 
-            Preference button = findPreference(getString(R.string.updateButtonKey));
-            button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    new UpdateTask().execute();
-                    return true;
-                }
-            });
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.AutomaticUpdateEnabledKey)));
+//            bindPreferenceSummaryToValue(findPreference(onBootEnabledKey));
+
         }
 
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-        }
+//        @Override
+//        public boolean onOptionsItemSelected(MenuItem item) {
+//            int id = item.getItemId();
+//            if (id == android.R.id.home) {
+//                startActivity(new Intent(getActivity(), SettingsActivity.class));
+//                return true;
+//            }
+//            return super.onOptionsItemSelected(item);
+//        }
     }
 
 
