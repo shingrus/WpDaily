@@ -27,7 +27,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = pref.edit();
                 SwitchCompat sw = (SwitchCompat) findViewById(R.id.welcomeEnableAutoUpdate);
                 editor.putBoolean(getString(R.string.WelcomeScreenShowedKey),true);
-                editor.putBoolean(getString(R.string.AutomaticUpdateEnabledKey), sw.isChecked());
+                editor.putBoolean(getString(R.string.AutoUpdateEnabledKey), sw.isChecked());
                 editor.apply();
 
                 Intent startMainActivity = new Intent(WelcomeActivity.this,WPDMainActivity.class);

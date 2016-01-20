@@ -33,7 +33,7 @@ public class WpDailyApplication extends Application {
 
         //
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isAutomaticUpdateEnable = pref.getBoolean(this.getString(R.string.AutomaticUpdateEnabledKey),true);
+        boolean isAutomaticUpdateEnable = pref.getBoolean(this.getString(R.string.AutoUpdateEnabledKey),true);
         if (isAutomaticUpdateEnable)
             WPUpdateService.restartJobFromPreferences(this, pref);
 

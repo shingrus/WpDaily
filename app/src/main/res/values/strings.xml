@@ -55,7 +55,7 @@
     <string name="share_menuitem">Share</string>
     <string name="setwp_menuitem">Set as Wallpaper</string>
     <string name="AutomaticUpdateEnableCheckBoxName">Automatically update Wallpaper</string>
-    <string name="AutomaticUpdateEnabledKey">automaticUpdateEnabled</string>
+    <string name="AutoUpdateEnabledKey">automaticUpdateEnabled</string>
     <string name="WelcomeScreenShowedKey">welcomeScreenShowed</string>
     <string name="WelcomeScreenContinueButton">Next</string>
     <string name="welcomeText">Wallpaper will be set automatically, every 6 hours</string>

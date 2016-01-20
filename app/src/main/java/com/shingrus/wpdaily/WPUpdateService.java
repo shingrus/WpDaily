@@ -59,14 +59,14 @@ public class WPUpdateService extends IntentService {
     }
 
     private static void restartJob(Context ctx, long seconds) {
-//        if (BuildConfig.DEBUG)
-//            seconds = 10;
+        if (BuildConfig.DEBUG)
+            seconds = 10;
 
         scheduleAlarm(ctx.getApplicationContext(), seconds * 1000);
     }
     public static void restartJobFromPreferences(Context ctx, SharedPreferences pref) {
 
-        boolean autoUpdate = pref.getBoolean(ctx.getString(R.string.AutomaticUpdateEnabledKey), false);
+        boolean autoUpdate = pref.getBoolean(ctx.getString(R.string.AutoUpdateEnabledKey), false);
         if (autoUpdate) {
             String freqKey = ctx.getString(R.string.update_freq_list);
             String freq = pref.getString(freqKey, "360");

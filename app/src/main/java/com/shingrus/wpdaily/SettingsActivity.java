@@ -2,7 +2,9 @@ package com.shingrus.wpdaily;
 
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -15,6 +17,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,7 +40,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     static String updateFreqKey = "";
     static String onBootEnabledKey = "";
-//    static String onAutoUpdateEnableKey = "";
+    static String onAutoUpdateEnableKey = "";
 //    static boolean onBootEnabled = false;
 
     /**
@@ -49,19 +52,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
-            Log.d(log_tag, "Pref changed");
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
                 ListPreference listPreference = (ListPreference) preference;
                 int index = listPreference.findIndexOfValue(stringValue);
 
-
-                if (!stringValue.equals(listPreference.getValue()) && listPreference.getKey().equals(updateFreqKey)) {
-
-                    //start job
-                    WPUpdateService.restartJobFromPreferences(preference.getContext(), preference.getSharedPreferences());
-                }
 
                 // Set the summary to reflect the new value.
                 preference.setSummary(
@@ -95,7 +91,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
-                Log.d(log_tag, "Pref: " + preference + "changed to: " + value );
                 preference.setSummary(stringValue);
 
             }
@@ -127,10 +122,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         // Trigger the listener immediately with the preference's
         // current value.
+
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+
     }
 
 
@@ -180,12 +177,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName);
     }
 
+
     /**
      * This fragment shows general preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
+    public static class GeneralPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -200,13 +198,35 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 updateFreqKey = getString(R.string.update_freq_list);
             if (onBootEnabledKey.isEmpty())
                 onBootEnabledKey = getString(R.string.onBootEnabledKey);
+            if (onAutoUpdateEnableKey.isEmpty())
+                onAutoUpdateEnableKey = getString(R.string.AutoUpdateEnabledKey);
 
             Preference preference = findPreference(updateFreqKey);
             bindPreferenceSummaryToValue(preference);
 
-//            bindPreferenceSummaryToValue(findPreference(getString(R.string.AutomaticUpdateEnabledKey)));
-//            bindPreferenceSummaryToValue(findPreference(onBootEnabledKey));
+        }
 
+        @Override
+        public void onResume() {
+            super.onResume();
+            getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+            Log.d(log_tag, "Preference changed: " + key);
+            if (key.equals(onAutoUpdateEnableKey) || key.equals(updateFreqKey)) {
+                Activity activity = getActivity();
+                if (activity != null)
+                    WPUpdateService.restartJobFromPreferences(activity.getApplicationContext(), sharedPreferences);
+            }
         }
 
 //        @Override
