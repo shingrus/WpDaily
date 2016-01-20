@@ -37,6 +37,13 @@ public final class SetWallPaper {
 
     private static final String LAST_IMAGE_URL_KEY = "last_image_url";
 
+    public enum UpdateResult {
+        SUCCESS,
+        NETWORK_FAIL,
+        FAIL,
+        ALREADY_SET
+    }
+
 
     private SetWallPaper(Context ctx) {
         this.appContext = ctx;
@@ -103,7 +110,7 @@ public final class SetWallPaper {
                 wp.setBitmap(image);
                 retVal = true;
             } catch (IOException e) {
-                Log.e(_log_tag, "set image error" + e);
+                Log.d(_log_tag, "set image error" + e);
             }
         }
         return retVal;
@@ -111,12 +118,11 @@ public final class SetWallPaper {
 
 
     /**
-     *
      * @param url - url where to get  new image
      * @return true if new image found, false - if not
      */
-    private boolean setWallPaperImage(URL url) {
-        boolean retVal = false;
+    private UpdateResult setWallPaperImage(URL url) {
+        UpdateResult retVal = UpdateResult.FAIL;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         String lastUrl = preferences.getString(LAST_IMAGE_URL_KEY, "");
         if (!lastUrl.equals(url.toString())) {
@@ -132,87 +138,96 @@ public final class SetWallPaper {
                 SharedPreferences.Editor e = preferences.edit();
                 e.putString(LAST_IMAGE_URL_KEY, url.toString());
                 e.apply();
-                retVal = true;
+                retVal = UpdateResult.SUCCESS;
             }
-        } else
+        } else {
+            retVal = UpdateResult.ALREADY_SET;
             Log.d(_log_tag, "We already set this image: " + url);
+        }
         return retVal;
 
     }
 
-    public boolean updateWallPaperImage() {
-        URL imageUrl = setWallPaper.GetLastWallpaperLink();
-        return imageUrl != null && setWallPaperImage(imageUrl);
+    public UpdateResult updateWallPaperImage() {
+        UpdateResult retVal = UpdateResult.FAIL;
+        try {
+            URL imageUrl = setWallPaper.GetLastWallpaperLink();
+            if (imageUrl != null) {
+                retVal = setWallPaperImage(imageUrl);
+            }
+        } catch (IOException e) {
+            retVal = UpdateResult.NETWORK_FAIL;
+            Log.d(_log_tag, "IO:Exception" + e);
+        }
+
+        return retVal;
     }
 
     /**
      * @return null if didn't find or url obj ad
      */
-    private URL GetLastWallpaperLink() {
+    private URL GetLastWallpaperLink() throws IOException {
         URL retrunValue = null;
 
         try {
             URL listOfImages = new URL(whereGetImages);
 
-            try {
-                URLConnection connection;
-                connection = listOfImages.openConnection();
-                if ((connection instanceof HttpURLConnection)) {
-                    HttpURLConnection httpcon = (HttpURLConnection) connection;
-                    httpcon.setReadTimeout(15000 /* milliseconds */);
-                    httpcon.setConnectTimeout(10000 /* milliseconds */);
-                    httpcon.setDoInput(true);
-                    httpcon.connect();
-                    int responseCode = httpcon.getResponseCode();
-                    switch (responseCode) {
-                        case HttpURLConnection.HTTP_OK:
 
-                            XmlPullParser parser = Xml.newPullParser();
+            URLConnection connection;
+            connection = listOfImages.openConnection();
+            if ((connection instanceof HttpURLConnection)) {
+                HttpURLConnection httpcon = (HttpURLConnection) connection;
+                httpcon.setReadTimeout(15000 /* milliseconds */);
+                httpcon.setConnectTimeout(10000 /* milliseconds */);
+                httpcon.setDoInput(true);
+                httpcon.connect();
+                int responseCode = httpcon.getResponseCode();
+                switch (responseCode) {
+                    case HttpURLConnection.HTTP_OK:
 
-                            try {
-                                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-                                //parser.require(XmlPullParser.START_TAG, null, "channel");
-                                parser.setInput(connection.getInputStream(), null);
-                                parser.nextTag();
-                                boolean insideItem = false; //here is some magic
+                        XmlPullParser parser = Xml.newPullParser();
+
+                        try {
+                            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+                            //parser.require(XmlPullParser.START_TAG, null, "channel");
+                            parser.setInput(connection.getInputStream(), null);
+                            parser.nextTag();
+                            boolean insideItem = false; //here is some magic
 
 
-                                while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                                    int event = parser.getEventType();
-                                    if (event == XmlPullParser.START_TAG) {
-                                        String name = parser.getName();
-                                        if (name.equals("item")) {
-                                            Log.d("XML", "Found item, go deeper");
-                                            insideItem = true;
-                                        } else if (insideItem && name.contentEquals("enclosure")) {
-                                            String xmlAttr = parser.getAttributeValue(null, "url");
-                                            if (xmlAttr != null) {
-                                                String newUrl = xmlAttr.replace(MagicURLReplacementFrom, MagicURLReplacementTo);
-                                                retrunValue = new URL(newUrl);
+                            while (parser.next() != XmlPullParser.END_DOCUMENT) {
+                                int event = parser.getEventType();
+                                if (event == XmlPullParser.START_TAG) {
+                                    String name = parser.getName();
+                                    if (name.equals("item")) {
+                                        Log.d("XML", "Found item, go deeper");
+                                        insideItem = true;
+                                    } else if (insideItem && name.contentEquals("enclosure")) {
+                                        String xmlAttr = parser.getAttributeValue(null, "url");
+                                        if (xmlAttr != null) {
+                                            String newUrl = xmlAttr.replace(MagicURLReplacementFrom, MagicURLReplacementTo);
+                                            retrunValue = new URL(newUrl);
 
-                                            }
-
-                                            break;
                                         }
 
+                                        break;
                                     }
-
 
                                 }
 
 
-                            } catch (XmlPullParserException e) {
-                                Log.d("XML", "Xml parser", e);
                             }
 
-                            break;
-                        default:
-                            Log.d("URL", "something went wrong, http status:" + responseCode);
-                    }
 
+                        } catch (XmlPullParserException e) {
+                            Log.d("XML", "Xml parser", e);
+                        }
+
+                        break;
+                    default:
+                        Log.d("URL", "something went wrong, http status:" + responseCode);
                 }
-            } catch (IOException e) {
-                e.  printStackTrace();
+
             }
 
 
