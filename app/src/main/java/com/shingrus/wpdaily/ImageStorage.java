@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteStatement;
 
 
 /**
- *
  * Image storage - Singleton object, has all necessary methods for database access
  * Created by shingrus on 06/12/15.
  */
@@ -22,35 +21,35 @@ public class ImageStorage {
     public static final String IMAGES_COLUMN_DATE_INSERTED = "inserted_at";
     public static final String IMAGES_COLUMN_PROVIDER = "provider";
     private static final String IMAGES_LAST_IMAGES_LIMIT = "10";
-    static final String CREATE_IMAGES_TABLE =   "CREATE TABLE '"+ IMAGES_TABLE_NAME +"' (" +
-            "'_id' INTEGER PRIMARY KEY AUTOINCREMENT,"+
+    static final String CREATE_IMAGES_TABLE = "CREATE TABLE '" + IMAGES_TABLE_NAME + "' (" +
+            "'_id' INTEGER PRIMARY KEY AUTOINCREMENT," +
             "'url' TEXT UNIQ, " +
             "'inserted_at' INTEGER default (strftime('%s','now'))," +
             "'provider' TEXT default ''," +
-            "'image' BLOB"+
+            "'image' BLOB" +
             ")";
 
 
     private static ImageStorage sInstance;
     private Context ctx;
-
+    private ImageDBHelper mImageDBHelper;
 
     private ImageStorage(Context context) {
         ctx = context;
-
+        mImageDBHelper = new ImageDBHelper(ctx);
     }
 
 
+    static final String INSERT_IMAGE_STMNT = "INSERT INTO " + IMAGES_TABLE_NAME + " (" +
+            IMAGES_COLUMN_URL + "," + IMAGES_COLUMN_PROVIDER + "," + IMAGES_COLUMN_IMAGE + ") VALUES(?,?,?)";
 
-    static final String INSERT_IMAGE_STMNT  =   "INSERT INTO " + IMAGES_TABLE_NAME + " ("+
-            IMAGES_COLUMN_URL+","+IMAGES_COLUMN_PROVIDER+","+IMAGES_COLUMN_IMAGE+") VALUES(?,?,?)";
     //
-    public void putImage (String url, String provider, byte[] buffer) {
+    public void putImage(String url, String provider, byte[] buffer) {
         //put image with now date
-        ImageDBHelper dbHelper = new ImageDBHelper(ctx);
+        ImageDBHelper dbHelper = mImageDBHelper;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        if ( db != null) {
-            SQLiteStatement insertStmt      =   db.compileStatement(INSERT_IMAGE_STMNT);
+        if (db != null) {
+            SQLiteStatement insertStmt = db.compileStatement(INSERT_IMAGE_STMNT);
             insertStmt.bindString(1, url);
             insertStmt.bindString(2, provider);
             insertStmt.bindBlob(3, buffer);
@@ -61,15 +60,13 @@ public class ImageStorage {
     }
 
 
-
     /**
-     *
      * @param id - int, Image id
      * @return Image object
      */
     public Image getImageById(long id) {
         Image retImage = null;
-        SQLiteDatabase db = new ImageDBHelper(this.ctx).getReadableDatabase();
+        SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
         String where = Long.toString(id);
         Cursor c = db.query(IMAGES_TABLE_NAME,
                 new String[]{IMAGES_COLUMN_IMAGE, IMAGES_COLUMN_DATE_INSERTED,
@@ -83,20 +80,19 @@ public class ImageStorage {
         if (c.moveToNext()) {
 
             byte[] b = c.getBlob(0);
-            if (b !=null){
+            if (b != null) {
                 retImage =
-                        new Image(c.getString(2),c.getInt(1),c.getString(3),b);
+                        new Image(c.getString(2), c.getInt(1), c.getString(3), b);
             }
         }
         return retImage;
     }
 
     /**
-     *
      * @return ArrayList<Image> - array list of images
      */
     public Cursor getLastImagesCursor() {
-        SQLiteDatabase db = new ImageDBHelper(this.ctx).getReadableDatabase();
+        SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
 
         return db.query(IMAGES_TABLE_NAME,
                 new String[]{IMAGES_COLUMN_IMAGE, IMAGES_COLUMN_DATE_INSERTED, IMAGES_COLUMN_URL, IMAGES_COLUMN_ID},
@@ -118,23 +114,12 @@ public class ImageStorage {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(CREATE_IMAGES_TABLE);
 
-            //DEBUG
-            if (BuildConfig.DEBUG) {
-                for (int i = 0; i< 50; i++) {
 
-                    SQLiteStatement insertStmt = db.compileStatement(INSERT_IMAGE_STMNT);
-                    insertStmt.bindString(1, "url:"+i);
-                    insertStmt.bindString(2, "Test Provider");
-                    insertStmt.bindBlob(3, null);
-                    insertStmt.execute();
-                    insertStmt.clearBindings();
-                }
-            }
         }
 
         @Override
-        public synchronized void  onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (oldVersion ==1 && newVersion == 2) {
+        public synchronized void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion == 1 && newVersion == 2) {
                 db.execSQL("DROP TABLE IF EXISTS Images");
                 this.onCreate(db);
             }
@@ -144,8 +129,9 @@ public class ImageStorage {
     public static synchronized ImageStorage getInstance() {
         return sInstance;
     }
+
     public static synchronized ImageStorage getInstance(Context context) {
-        if (sInstance == null && context!=null) {
+        if (sInstance == null && context != null) {
             sInstance = new ImageStorage(context);
         }
         return sInstance;
