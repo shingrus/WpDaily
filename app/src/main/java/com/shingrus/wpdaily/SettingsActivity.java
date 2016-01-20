@@ -204,7 +204,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             Preference preference = findPreference(updateFreqKey);
             bindPreferenceSummaryToValue(preference);
 
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.AutomaticUpdateEnabledKey)));
+//            bindPreferenceSummaryToValue(findPreference(getString(R.string.AutomaticUpdateEnabledKey)));
 //            bindPreferenceSummaryToValue(findPreference(onBootEnabledKey));
 
         }
