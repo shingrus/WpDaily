@@ -25,7 +25,6 @@ public class BootCompletedReceiver extends WakefulBroadcastReceiver {
             Boolean onBootEnabled = pref.getBoolean(ctx.getString(R.string.onBootEnabledKey), true);
 
             if (onBootEnabled) {
-                //PeriodicalJobService.startJobfromPreferences(ctx,pref);
                 WPUpdateService.restartJobFromPreferences(ctx, pref);
 
             }
