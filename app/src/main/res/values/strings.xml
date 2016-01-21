@@ -46,8 +46,8 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="update_freq_list">upadate_freq_list</string>
-    <string name="updateButtonLabel">Update Wallpaper</string>
-    <string name="updateButtonKey">updatebutton</string>
+    <string name="aboutLabel">Build number: </string>
+    <string name="aboutKey">updatebutton</string>
     <string name="OnBootCheckBoxName">Start update after reboot</string>
     <string name="onBootEnabledKey">onBootEnabled</string>
     <string name="action_settings">Settings</string>

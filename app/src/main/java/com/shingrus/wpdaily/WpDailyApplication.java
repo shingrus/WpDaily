@@ -3,6 +3,8 @@ package com.shingrus.wpdaily;
 import android.app.Application;
 
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -38,7 +40,7 @@ public class WpDailyApplication extends Application {
             WPUpdateService.restartJobFromPreferences(this, pref);
 
         //update on start
-        Log.i(_log_tag, "Start application");
+        Log.d(_log_tag, "Start application:"+BuildConfig.VERSION_CODE);
 
 
     }

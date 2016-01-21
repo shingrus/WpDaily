@@ -204,6 +204,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             Preference preference = findPreference(updateFreqKey);
             bindPreferenceSummaryToValue(preference);
 
+            preference = findPreference(getString(R.string.aboutKey));
+
+            preference.setTitle(getString(R.string.aboutLabel) + BuildConfig.VERSION_CODE);
+
         }
 
         @Override

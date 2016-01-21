@@ -59,8 +59,8 @@ public class WPUpdateService extends IntentService {
     }
 
     private static void restartJob(Context ctx, long seconds) {
-        if (BuildConfig.DEBUG)
-            seconds = 10;
+//        if (BuildConfig.DEBUG)
+//            seconds = 10;
 
         scheduleAlarm(ctx.getApplicationContext(), seconds * 1000);
     }

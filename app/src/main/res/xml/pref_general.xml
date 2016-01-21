@@ -46,7 +46,7 @@
         />
 
 
-    <Preference  android:key="@string/updateButtonKey" android:title="@string/updateButtonLabel"/>
+    <Preference  android:key="@string/aboutKey" android:title="@string/aboutLabel"/>
 
 
 
