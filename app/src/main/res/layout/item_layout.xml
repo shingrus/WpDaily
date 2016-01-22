@@ -1,13 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
 
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <ImageView
         android:id="@+id/ItemImageId"
+        android:src="@drawable/ic_sync_black_24dp"
         android:layout_width="match_parent"
+        android:adjustViewBounds="true"
+        android:layout_centerHorizontal="true"
         android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/ItemProviderId"
+        android:layout_below="@id/ItemImageId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:text="" />
+    <TextView
+        android:id="@+id/ItemDateId"
+        android:layout_below="@id/ItemImageId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:text="" />
+
+</RelativeLayout><!--LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:contentDescription="@string/ImageContentDescription">
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,43 +48,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="right"
-            android:text="Text" />
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/ItemShareId"
-            android:layout_gravity="right"
-            android:layout_toLeftOf="@+id/ItemDateId"
-            android:src="@drawable/ic_share_black_48dp" />
-    </LinearLayout>
+            android:text="" />
+    </LinearLayout-->
 
 
-</LinearLayout>
 
-<!--RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
-android:layout_height="match_parent">
 
-<ImageView
-    android:id="@+id/ItemImageId"
+    <!--RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentTop="true"
-    android:layout_centerHorizontal="true" />
+    android:layout_height="match_parent">
 
-<ImageButton
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/ItemShareId"
-    android:layout_toLeftOf="@+id/ItemDateId"
-    android:src="@drawable/ic_share_black_48dp" />
+    <ImageView
+        android:id="@+id/ItemImageId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
-<TextView
-    android:id="@+id/ItemDateId"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_alignParentRight="true"
-    android:gravity="right"
-    android:text="Text" />
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ItemShareId"
+        android:layout_toLeftOf="@+id/ItemDateId"
+        android:src="@drawable/ic_share_black_48dp" />
 
-</RelativeLayout-->
+    <TextView
+        android:id="@+id/ItemDateId"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:gravity="right"
+        android:text="Text" />
+
+    </RelativeLayout-->

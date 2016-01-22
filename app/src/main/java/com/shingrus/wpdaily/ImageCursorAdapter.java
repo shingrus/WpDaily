@@ -22,6 +22,7 @@ import java.util.Date;
 public class ImageCursorAdapter extends CursorAdapter {
     DateFormat df;
     LayoutInflater inflater;
+
     private static final String _log_tag = "WPD/ImageCursor";
 
     public ImageCursorAdapter(Context context, Cursor c) {
@@ -37,21 +38,32 @@ public class ImageCursorAdapter extends CursorAdapter {
 
     }
 
+    private static int image_idx=-1, date_idx=-1, provider_idx=-1;
     @Override
     public void bindView(View view, Context ctx, Cursor c) {
         ImageView iv = (ImageView) view.findViewById(R.id.ItemImageId);
+        if (image_idx ==-1)
+            image_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_IMAGE);
+        if (date_idx ==-1)
+            date_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_DATE_INSERTED);
+        if (provider_idx==-1)
+            provider_idx=c.getColumnIndex(ImageStorage.IMAGES_COLUMN_PROVIDER);
 
-        TextView tv = (TextView) view.findViewById(R.id.ItemDateId);
-        byte[] image = c.getBlob(c.getColumnIndex(ImageStorage.IMAGES_COLUMN_IMAGE));
+        byte[] image = c.getBlob(image_idx);
         if (image != null && image.length > 0) {
-            int date = c.getInt(c.getColumnIndex(ImageStorage.IMAGES_COLUMN_DATE_INSERTED));
+            int date = c.getInt(date_idx);
+            String prov = c.getString(provider_idx);
             long longdate = (long) date * 1000;
 
             Bitmap origBitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
 
             iv.setImageBitmap(origBitmap);
-
+            TextView tv = (TextView) view.findViewById(R.id.ItemDateId);
             tv.setText(df.format(new Date(longdate)));
+
+            tv = (TextView) view.findViewById(R.id.ItemProviderId);
+            tv.setText(prov);
+
         }
         Log.d(_log_tag, "bind view");
     }
