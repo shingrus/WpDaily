@@ -24,7 +24,6 @@
     <SwitchPreference
         android:title="@string/AutomaticUpdateEnableCheckBoxName"
         android:key="@string/AutoUpdateEnabledKey"
-        android:summary="Enable Wallpaper updating in backgroud, without user interaction"
         android:defaultValue="true"
         />
     <ListPreference
