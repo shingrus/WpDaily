@@ -72,6 +72,12 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         unregisterReceiver(updateReceiver);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateImages();
+    }
+
     private void updateImages() {
         Intent intent = new Intent(this.getApplicationContext(), WPUpdateService.class);
         startService(intent);
