@@ -25,17 +25,17 @@ public class NetworkBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 
-            Bundle extras = intent.getExtras();
-
-
-            if (extras != null) {
-                for (String key: extras.keySet()) {
-                    Log.d(_log_tag, "key [" + key + "]: " +
-                            extras.get(key));
-                }
-            }
-//                Intent  serviceIntent = new Intent(ACTION_NETWORK, null, context, WPUpdateService.class);
-//                context.startService(serviceIntent);
+//            Bundle extras = intent.getExtras();
+//
+//
+//            if (extras != null) {
+//                for (String key: extras.keySet()) {
+//                    Log.d(_log_tag, "key [" + key + "]: " +
+//                            extras.get(key));
+//                }
+//            }
+                Intent  serviceIntent = new Intent(ACTION_NETWORK, null, context, WPUpdateService.class);
+                context.startService(serviceIntent);
 
 
         } else {
