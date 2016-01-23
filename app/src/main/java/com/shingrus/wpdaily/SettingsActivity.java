@@ -66,7 +66,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 : null);
 
 
-            } else if (preference instanceof RingtonePreference) {
+            } /*else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
                 // using RingtoneManager.
                 if (TextUtils.isEmpty(stringValue)) {
@@ -88,7 +88,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     }
                 }
 
-            } else {
+            } */
+            else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
