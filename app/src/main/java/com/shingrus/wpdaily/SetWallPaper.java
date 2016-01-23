@@ -2,10 +2,8 @@ package com.shingrus.wpdaily;
 
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Xml;
 
@@ -34,6 +32,8 @@ public final class SetWallPaper {
     private static final String MagicURLReplacementFrom = "360x270";
     private static final String MagicURLReplacementTo = "990x742";
     private static final String PROVIDER = "National Geographic";
+    private static final int TIMEOUT_CONNECT = 10000;
+    private static final int TIMEOUT_READ = 20000;
 
 //    private static final String LAST_IMAGE_URL_KEY = "last_image_url";
 
@@ -67,8 +67,8 @@ public final class SetWallPaper {
         if (url != null) {
             try {
                 URLConnection conn = url.openConnection();
-                conn.setConnectTimeout(10000);
-                conn.setReadTimeout(15000);
+                conn.setConnectTimeout(TIMEOUT_CONNECT);
+                conn.setReadTimeout(TIMEOUT_READ);
                 InputStream in = conn.getInputStream();
                 int contentLength = conn.getContentLength();
                 ByteArrayOutputStream baos;
@@ -178,8 +178,8 @@ public final class SetWallPaper {
             connection = listOfImages.openConnection();
             if ((connection instanceof HttpURLConnection)) {
                 HttpURLConnection httpcon = (HttpURLConnection) connection;
-                httpcon.setReadTimeout(15000 /* milliseconds */);
-                httpcon.setConnectTimeout(10000 /* milliseconds */);
+                httpcon.setReadTimeout(TIMEOUT_READ);
+                httpcon.setConnectTimeout(TIMEOUT_CONNECT);
                 httpcon.setDoInput(true);
                 httpcon.connect();
                 int responseCode = httpcon.getResponseCode();
