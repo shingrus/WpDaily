@@ -111,13 +111,6 @@ public class WPUpdateService extends IntentService {
         SetWallPaper.UpdateResult retVal = SetWallPaper.getSetWallPaper().updateWallPaperImage();
         Log.d(_log_tag, "Doing update from service");
 
-        //Notify activity about new content
-        Intent intentForActivity = new Intent();
-        intentForActivity.setAction(UPDATE_ACTIVITY_ACTION);
-        intentForActivity.putExtra(RESULT_EXTRA, retVal);
-        sendBroadcast(intentForActivity);
-
-
         return retVal;
     }
 
@@ -125,6 +118,10 @@ public class WPUpdateService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         String action = intent.getAction();
         Log.d(_log_tag, "Start service job");
+
+        //Intent to notify activity about update result
+        Intent intentForActivity = new Intent();
+        intentForActivity.setAction(UPDATE_ACTIVITY_ACTION);
         if (checkNetworkState()) {
             SetWallPaper.UpdateResult updateResult = doUpdate();
             Log.d(_log_tag, "Update result: " + updateResult);
@@ -133,11 +130,13 @@ public class WPUpdateService extends IntentService {
                     //don't unsubscribe from network events till we have network error
                 subscribeOnNetworkChanges(false);
             }
-
+            intentForActivity.putExtra(RESULT_EXTRA, updateResult);
 
         } else {
+            intentForActivity.putExtra(RESULT_EXTRA, SetWallPaper.UpdateResult.NETWORK_FAIL);
             subscribeOnNetworkChanges(true);
         }
+        sendBroadcast(intentForActivity);
         completeWakefulIntent(intent);
 
     }

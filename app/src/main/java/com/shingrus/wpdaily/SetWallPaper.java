@@ -67,6 +67,8 @@ public final class SetWallPaper {
         if (url != null) {
             try {
                 URLConnection conn = url.openConnection();
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(15000);
                 InputStream in = conn.getInputStream();
                 int contentLength = conn.getContentLength();
                 ByteArrayOutputStream baos;
@@ -86,8 +88,6 @@ public final class SetWallPaper {
                 in.close();
 
                 retVal = baos.toByteArray();
-
-                //bmp = BitmapFactory.decodeByteArray(baos.toByteArray(),0,baos.size());
 
 
             } catch (IOException e) {
