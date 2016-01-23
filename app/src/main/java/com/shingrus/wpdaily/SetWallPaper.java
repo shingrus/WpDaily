@@ -35,7 +35,7 @@ public final class SetWallPaper {
     private static final String MagicURLReplacementTo = "990x742";
     private static final String PROVIDER = "National Geographic";
 
-    private static final String LAST_IMAGE_URL_KEY = "last_image_url";
+//    private static final String LAST_IMAGE_URL_KEY = "last_image_url";
 
     public enum UpdateResult {
         SUCCESS,
@@ -123,21 +123,22 @@ public final class SetWallPaper {
      */
     private UpdateResult setWallPaperImage(URL url) {
         UpdateResult retVal = UpdateResult.FAIL;
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
-        String lastUrl = preferences.getString(LAST_IMAGE_URL_KEY, "");
-        if (!lastUrl.equals(url.toString())) {
-
+        ImageStorage storage = ImageStorage.getInstance(appContext);
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
+//        String lastUrl = preferences.getString(LAST_IMAGE_URL_KEY, "");
+//        if (!lastUrl.equals(url.toString())) {
+        if (!storage.isUrlAlreadyDownloaded(url.toString())) {
             byte[] imageBuf = getImage(url);
             if (setWallPaperImage(imageBuf)) {
                 Log.d(_log_tag, "Set new image:" + url);
 
                 //store Image
-                ImageStorage storage = ImageStorage.getInstance(appContext);
+
                 storage.putImage(url.toString(), PROVIDER, imageBuf);
 
-                SharedPreferences.Editor e = preferences.edit();
-                e.putString(LAST_IMAGE_URL_KEY, url.toString());
-                e.apply();
+                //SharedPreferences.Editor e = preferences.edit();
+                //e.putString(LAST_IMAGE_URL_KEY, url.toString());
+                //e.apply();
                 retVal = UpdateResult.SUCCESS;
             }
         } else {

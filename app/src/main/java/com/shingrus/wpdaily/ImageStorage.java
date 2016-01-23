@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteStatement;
  * Created by shingrus on 06/12/15.
  */
 public class ImageStorage {
+    private static int KEEP_LAST_IMAGES_NUMBER = 10;
     private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "Images.db";
     private static final String IMAGES_TABLE_NAME = "Images";
@@ -31,11 +32,11 @@ public class ImageStorage {
 
 
     private static ImageStorage sInstance;
-    private Context ctx;
+    //    private Context ctx;
     private ImageDBHelper mImageDBHelper;
 
-    private ImageStorage(Context context) {
-        ctx = context;
+    private ImageStorage(Context ctx) {
+//        ctx = context;
         mImageDBHelper = new ImageDBHelper(ctx);
     }
 
@@ -43,11 +44,35 @@ public class ImageStorage {
     static final String INSERT_IMAGE_STMNT = "INSERT INTO " + IMAGES_TABLE_NAME + " (" +
             IMAGES_COLUMN_URL + "," + IMAGES_COLUMN_PROVIDER + "," + IMAGES_COLUMN_IMAGE + ") VALUES(?,?,?)";
 
-    //
+    /*
+    there is actuaaly ugly request, but it should works on very small databases
+     */
+    private static final String DROP_OLD_RECORDS = "DELETE FROM " + IMAGES_TABLE_NAME +
+            " WHERE " + IMAGES_COLUMN_ID + " not in (SELECT " +
+            IMAGES_COLUMN_ID + " FROM " +
+            IMAGES_TABLE_NAME + " ORDER BY " + IMAGES_COLUMN_DATE_INSERTED + " Desc limit " + KEEP_LAST_IMAGES_NUMBER + ")";
+
+
+    public boolean isUrlAlreadyDownloaded(String url) {
+        SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
+        Cursor c = db.query(IMAGES_TABLE_NAME,
+                new String[]{IMAGES_COLUMN_ID},
+                IMAGES_COLUMN_URL + " = ?",
+                new String[]{url},
+                null,
+                null,
+                null
+        );
+        if (c.getCount() >0){
+            return true;
+        }
+        c.close();
+        return false;
+    }
+
     public void putImage(String url, String provider, byte[] buffer) {
         //put image with now date
-        ImageDBHelper dbHelper = mImageDBHelper;
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = mImageDBHelper.getWritableDatabase();
         if (db != null) {
             SQLiteStatement insertStmt = db.compileStatement(INSERT_IMAGE_STMNT);
             insertStmt.bindString(1, url);
