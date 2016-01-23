@@ -70,6 +70,12 @@ public class ImageStorage {
         return false;
     }
 
+    /**
+     *
+     * @param url - Image url
+     * @param provider - String name human readable of the image provider like Flickr, natgeo, gopro...
+     * @param buffer - bunary data of the image
+     */
     public void putImage(String url, String provider, byte[] buffer) {
         //put image with now date
         SQLiteDatabase db = mImageDBHelper.getWritableDatabase();
@@ -84,6 +90,13 @@ public class ImageStorage {
 
     }
 
+    public int deleteImage(long id) {
+        SQLiteDatabase db = mImageDBHelper.getWritableDatabase();
+        if (db!=null) {
+            return db.delete(IMAGES_TABLE_NAME, IMAGES_COLUMN_ID + "=?", new String[]{Long.toString(id)});
+        }
+        return -1;
+    }
 
     /**
      * @param id - int, Image id

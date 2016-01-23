@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -85,6 +86,32 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 
     }
 
+    private void deleteImage(final long itemId) {
+        Log.d(_log_tag, "Ask for image delete:" + itemId);
+        new AsyncTask<Long, Void, Cursor>() {
+            @Override
+            protected Cursor doInBackground(Long... imageId) {
+                ImageStorage storage = ImageStorage.getInstance();
+                int deleteResult = storage.deleteImage(imageId[0]);
+                if (deleteResult>0) {
+                    Log.d(_log_tag, "Removed images number: " +deleteResult);
+                    return storage.getLastImagesCursor();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Cursor c) {
+
+                if (imageCursorAdapter != null) {
+                    imageCursorAdapter.changeCursor(c);
+                }
+            }
+
+        }.execute(itemId, null, null);
+
+    }
+
     private void getImagesFromStorage() {
 
         new AsyncTask<Void, Void, Cursor>() {
@@ -105,6 +132,14 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         }.execute(null, null, null);
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.images_list) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.image_item_menu, menu);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -116,12 +151,24 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
+            case R.id.menu_action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_action_delete:
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                deleteImage(info.id);
+                return true;
+        }
+
+        return super.onContextItemSelected(item);
     }
 
     @Override
@@ -141,13 +188,15 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
             ListView listView = (ListView) findViewById(R.id.images_list);
             imageCursorAdapter = new ImageCursorAdapter(WPDMainActivity.this, null);
             listView.setAdapter(imageCursorAdapter);
-            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    return false;
-                }
-            });
+//            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//                @Override
+//                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                    return true;
+//                }
+//            });
             registerForContextMenu(listView);
+
 
 //        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
