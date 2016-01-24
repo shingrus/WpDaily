@@ -17,6 +17,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by shingrus on 24/11/15.
@@ -28,12 +31,15 @@ public final class SetWallPaper {
     static SetWallPaper setWallPaper;
     static final String _log_tag = "SetWallPaper";
 
-    private static final String whereGetImages = "http://feeds.nationalgeographic.com/ng/photography/photo-of-the-day?format=xml";
-    private static final String MagicURLReplacementFrom = "360x270";
-    private static final String MagicURLReplacementTo = "990x742";
-    private static final String PROVIDER = "National Geographic";
-    private static final int TIMEOUT_CONNECT = 10000;
-    private static final int TIMEOUT_READ = 20000;
+
+    public static final int TIMEOUT_CONNECT = 10000;
+    public static final int TIMEOUT_READ = 20000;
+
+
+    private final List<WallpaperProvider> providers = new ArrayList<>();
+    WallpaperProvider currentProvider = null;
+    int currentProviderPos;
+
 
 //    private static final String LAST_IMAGE_URL_KEY = "last_image_url";
 
@@ -47,16 +53,13 @@ public final class SetWallPaper {
 
     private SetWallPaper(Context ctx) {
         this.appContext = ctx;
+        initProviders();
     }
 
     public static synchronized SetWallPaper getSetWallPaper(Context ctx) {
-        if (ctx != null && setWallPaper == null) {
+        if (setWallPaper == null && ctx != null ) {
             setWallPaper = new SetWallPaper(ctx);
         }
-        return setWallPaper;
-    }
-
-    public static synchronized SetWallPaper getSetWallPaper() {
         return setWallPaper;
     }
 
@@ -121,12 +124,10 @@ public final class SetWallPaper {
      * @param url - url where to get  new image
      * @return true if new image found, false - if not
      */
-    private UpdateResult setWallPaperImage(URL url) {
+    private synchronized UpdateResult setWallPaperImage(URL url) {
         UpdateResult retVal = UpdateResult.FAIL;
         ImageStorage storage = ImageStorage.getInstance(appContext);
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
-//        String lastUrl = preferences.getString(LAST_IMAGE_URL_KEY, "");
-//        if (!lastUrl.equals(url.toString())) {
+
         if (!storage.isUrlAlreadyDownloaded(url.toString())) {
             byte[] imageBuf = getImage(url);
             if (setWallPaperImage(imageBuf)) {
@@ -134,11 +135,8 @@ public final class SetWallPaper {
 
                 //store Image
 
-                storage.putImage(url.toString(), PROVIDER, imageBuf);
+                storage.putImage(url.toString(), currentProvider.getWallpaperProvider(), imageBuf);
 
-                //SharedPreferences.Editor e = preferences.edit();
-                //e.putString(LAST_IMAGE_URL_KEY, url.toString());
-                //e.apply();
                 retVal = UpdateResult.SUCCESS;
             }
         } else {
@@ -152,7 +150,9 @@ public final class SetWallPaper {
     public UpdateResult updateWallPaperImage() {
         UpdateResult retVal = UpdateResult.FAIL;
         try {
-            URL imageUrl = setWallPaper.GetLastWallpaperLink();
+            //chose provider
+            currentProvider = setNextProvider();
+            URL imageUrl = currentProvider.GetLastWallpaperLink();
             if (imageUrl != null) {
                 retVal = setWallPaperImage(imageUrl);
             }
@@ -164,81 +164,19 @@ public final class SetWallPaper {
         return retVal;
     }
 
-    /**
-     * @return null if didn't find or url obj ad
-     */
-    private URL GetLastWallpaperLink() throws IOException {
-        URL retrunValue = null;
-
-        try {
-            URL listOfImages = new URL(whereGetImages);
-
-
-            URLConnection connection;
-            connection = listOfImages.openConnection();
-            if ((connection instanceof HttpURLConnection)) {
-                HttpURLConnection httpcon = (HttpURLConnection) connection;
-                httpcon.setReadTimeout(TIMEOUT_READ);
-                httpcon.setConnectTimeout(TIMEOUT_CONNECT);
-                httpcon.setDoInput(true);
-                httpcon.connect();
-                int responseCode = httpcon.getResponseCode();
-                switch (responseCode) {
-                    case HttpURLConnection.HTTP_OK:
-
-                        XmlPullParser parser = Xml.newPullParser();
-
-                        try {
-                            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-                            //parser.require(XmlPullParser.START_TAG, null, "channel");
-                            parser.setInput(connection.getInputStream(), null);
-                            parser.nextTag();
-                            boolean insideItem = false; //here is some magic
-
-
-                            while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                                int event = parser.getEventType();
-                                if (event == XmlPullParser.START_TAG) {
-                                    String name = parser.getName();
-                                    if (name.equals("item")) {
-                                        Log.d("XML", "Found item, go deeper");
-                                        insideItem = true;
-                                    } else if (insideItem && name.contentEquals("enclosure")) {
-                                        String xmlAttr = parser.getAttributeValue(null, "url");
-                                        if (xmlAttr != null) {
-                                            String newUrl = xmlAttr.replace(MagicURLReplacementFrom, MagicURLReplacementTo);
-                                            retrunValue = new URL(newUrl);
-
-                                        }
-
-                                        break;
-                                    }
-
-                                }
-
-
-                            }
-
-
-                        } catch (XmlPullParserException e) {
-                            Log.d("XML", "Xml parser", e);
-                        }
-
-                        break;
-                    default:
-                        Log.d("URL", "something went wrong, http status:" + responseCode);
-                }
-
-            }
-
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-
-        return retrunValue;
+    private WallpaperProvider setNextProvider() {
+        WallpaperProvider prov = providers.get(currentProviderPos++);
+        currentProviderPos %= providers.size();
+        Log.d(_log_tag, "Next provider will be: "+prov);
+        return prov;
     }
+
+    private void initProviders() {
+        providers.add(new VokrugSvetaProvider());
+        providers.add(new NationalGeographicProvider());
+        currentProviderPos = 0;
+    }
+
 
 
 }

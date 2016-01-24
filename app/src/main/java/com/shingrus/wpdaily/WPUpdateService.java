@@ -108,7 +108,7 @@ public class WPUpdateService extends IntentService {
 
     private SetWallPaper.UpdateResult doUpdate() {
 
-        SetWallPaper.UpdateResult retVal = SetWallPaper.getSetWallPaper().updateWallPaperImage();
+        SetWallPaper.UpdateResult retVal = SetWallPaper.getSetWallPaper(null).updateWallPaperImage();
         Log.d(_log_tag, "Doing update from service");
 
         return retVal;
