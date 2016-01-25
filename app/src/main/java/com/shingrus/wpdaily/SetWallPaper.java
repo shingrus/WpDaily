@@ -47,7 +47,7 @@ public final class SetWallPaper {
         SUCCESS,
         NETWORK_FAIL,
         FAIL,
-        ALREADY_SET
+        PROVIDER_FAIL, ALREADY_SET
     }
 
 
@@ -57,7 +57,7 @@ public final class SetWallPaper {
     }
 
     public static synchronized SetWallPaper getSetWallPaper(Context ctx) {
-        if (setWallPaper == null && ctx != null ) {
+        if (setWallPaper == null && ctx != null) {
             setWallPaper = new SetWallPaper(ctx);
         }
         return setWallPaper;
@@ -121,27 +121,37 @@ public final class SetWallPaper {
 
 
     /**
-     * @param url - url where to get  new image
+     * @param imageDescription - ImageDescription where to get  new image
      * @return true if new image found, false - if not
      */
-    private synchronized UpdateResult setWallPaperImage(URL url) {
+    private synchronized UpdateResult setWallPaperImage(ImageDescription imageDescription) {
         UpdateResult retVal = UpdateResult.FAIL;
         ImageStorage storage = ImageStorage.getInstance(appContext);
 
-        if (!storage.isUrlAlreadyDownloaded(url.toString())) {
-            byte[] imageBuf = getImage(url);
-            if (setWallPaperImage(imageBuf)) {
-                Log.d(_log_tag, "Set new image:" + url);
+        if (!storage.isUrlAlreadyDownloaded(imageDescription.getUrl())) {
+            try {
+                URL url = new URL(imageDescription.getUrl());
 
-                //store Image
+                byte[] imageBuf = getImage(url);
 
-                storage.putImage(url.toString(), currentProvider.getWallpaperProvider(), imageBuf);
+                if (setWallPaperImage(imageBuf)) {
+                    Log.d(_log_tag, "Set new image:" + url);
 
-                retVal = UpdateResult.SUCCESS;
+                    //store ImageDescription
+
+                    storage.putImage(imageDescription.getUrl(), currentProvider.getWallpaperProvider(),
+                            imageDescription.getLinkPage(), imageBuf);
+
+                    retVal = UpdateResult.SUCCESS;
+                }
+
+            } catch (MalformedURLException e) {
+                retVal = UpdateResult.PROVIDER_FAIL;
             }
+
         } else {
             retVal = UpdateResult.ALREADY_SET;
-            Log.d(_log_tag, "We already set this image: " + url);
+            Log.d(_log_tag, "We already set this image: " + imageDescription.getUrl());
         }
         return retVal;
 
@@ -152,9 +162,9 @@ public final class SetWallPaper {
         try {
             //chose provider
             currentProvider = setNextProvider();
-            URL imageUrl = currentProvider.GetLastWallpaperLink();
-            if (imageUrl != null) {
-                retVal = setWallPaperImage(imageUrl);
+            ImageDescription imageDescription = currentProvider.GetLastWallpaperLink();
+            if (imageDescription != null) {
+                retVal = setWallPaperImage(imageDescription);
             }
         } catch (IOException e) {
             retVal = UpdateResult.NETWORK_FAIL;
@@ -167,7 +177,7 @@ public final class SetWallPaper {
     private WallpaperProvider setNextProvider() {
         WallpaperProvider prov = providers.get(currentProviderPos++);
         currentProviderPos %= providers.size();
-        Log.d(_log_tag, "Next provider will be: "+prov);
+        Log.d(_log_tag, "Next provider will be: " + prov);
         return prov;
     }
 
@@ -176,7 +186,6 @@ public final class SetWallPaper {
         providers.add(new NationalGeographicProvider());
         currentProviderPos = 0;
     }
-
 
 
 }

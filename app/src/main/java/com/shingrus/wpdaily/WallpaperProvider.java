@@ -9,5 +9,5 @@ import java.net.URL;
  */
 public interface WallpaperProvider {
     String getWallpaperProvider();
-    URL GetLastWallpaperLink() throws IOException;
+    ImageDescription GetLastWallpaperLink() throws IOException;
 }

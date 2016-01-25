@@ -17,11 +17,12 @@ import java.net.URLConnection;
  * National Geographic Providers
  * Provides last photo of the day
  */
-public class NationalGeographicProvider implements  WallpaperProvider{
+public class NationalGeographicProvider implements WallpaperProvider {
     private static final String whereGetImages = "http://feeds.nationalgeographic.com/ng/photography/photo-of-the-day?format=xml";
     private static final String MagicURLReplacementFrom = "360x270";
     private static final String MagicURLReplacementTo = "990x742";
     private static final String PROVIDER = "National Geographic";
+
     @Override
     public String getWallpaperProvider() {
         return PROVIDER;
@@ -33,8 +34,8 @@ public class NationalGeographicProvider implements  WallpaperProvider{
     }
 
     @Override
-    public URL GetLastWallpaperLink() throws IOException {
-        URL retrunValue = null;
+    public ImageDescription GetLastWallpaperLink() throws IOException {
+        ImageDescription returnImage = null;
 
         try {
             URL listOfImages = new URL(whereGetImages);
@@ -60,7 +61,8 @@ public class NationalGeographicProvider implements  WallpaperProvider{
                             parser.setInput(connection.getInputStream(), null);
                             parser.nextTag();
                             boolean insideItem = false; //here is some magic
-
+                            boolean insideLink = false;
+                            String pageLink = null;
 
                             while (parser.next() != XmlPullParser.END_DOCUMENT) {
                                 int event = parser.getEventType();
@@ -69,17 +71,26 @@ public class NationalGeographicProvider implements  WallpaperProvider{
                                     if (name.equals("item")) {
                                         Log.d("XML", "Found item, go deeper");
                                         insideItem = true;
+
                                     } else if (insideItem && name.contentEquals("enclosure")) {
                                         String xmlAttr = parser.getAttributeValue(null, "url");
                                         if (xmlAttr != null) {
                                             String newUrl = xmlAttr.replace(MagicURLReplacementFrom, MagicURLReplacementTo);
-                                            retrunValue = new URL(newUrl);
-
+                                            //retrunValue = new URL(newUrl);
+                                            returnImage = new ImageDescription(newUrl);
+                                            returnImage.setLinkPage(pageLink);
                                         }
 
                                         break;
+                                    } else if (insideItem && name.contentEquals("link")) {
+                                        insideLink = true;
                                     }
-
+                                } else if (event == XmlPullParser.TEXT) {
+                                    if (insideItem && insideLink) {
+                                        pageLink = parser.getText();
+                                        Log.d("XML", "NG pagelink: " + pageLink);
+                                        insideLink = false;
+                                    }
                                 }
 
 
@@ -103,6 +114,6 @@ public class NationalGeographicProvider implements  WallpaperProvider{
         }
 
 
-        return retrunValue;
+        return returnImage;
     }
 }

@@ -32,8 +32,8 @@ public class VokrugSvetaProvider implements WallpaperProvider {
     }
 
     @Override
-    public URL GetLastWallpaperLink() throws IOException {
-        URL retVal = null;
+    public ImageDescription GetLastWallpaperLink() throws IOException {
+        ImageDescription retVal = null;
         try {
             URL listOfImages = new URL(whereGetImages);
 
@@ -58,8 +58,8 @@ public class VokrugSvetaProvider implements WallpaperProvider {
                             parser.setInput(connection.getInputStream(), null);
                             parser.nextTag();
                             boolean insideItem = false; //here is some magic
-
-
+                            boolean insideLink = false;
+                            String pageLink = null;
                             while (parser.next() != XmlPullParser.END_DOCUMENT) {
                                 int event = parser.getEventType();
                                 if (event == XmlPullParser.START_TAG) {
@@ -70,14 +70,21 @@ public class VokrugSvetaProvider implements WallpaperProvider {
                                     } else if (insideItem && name.contentEquals("enclosure")) {
                                         String xmlAttr = parser.getAttributeValue(null, "url");
                                         if (xmlAttr != null) {
-//                                            String newUrl = xmlAttr.replace(MagicURLReplacementFrom, MagicURLReplacementTo);
-                                            retVal = new URL(xmlAttr);
-
+                                            retVal = new ImageDescription(xmlAttr);
+                                            retVal.setLinkPage(pageLink);
                                         }
 
                                         break;
                                     }
+                                    else if (insideItem && name.contentEquals("link")) {
+                                        insideLink = true;
+                                    }
 
+                                }
+                                else if (insideItem && insideLink&& event == XmlPullParser.TEXT) {
+                                    insideLink = false;
+                                    pageLink = parser.getText();
+                                    Log.d("XML", "VS pagelink: " + pageLink );
                                 }
 
 

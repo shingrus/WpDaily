@@ -2,24 +2,26 @@ package com.shingrus.wpdaily;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
 
 /**
- * Image storage - Singleton object, has all necessary methods for database access
+ * ImageDescription storage - Singleton object, has all necessary methods for database access
  * Created by shingrus on 06/12/15.
  */
 public class ImageStorage {
-    private static int KEEP_LAST_IMAGES_NUMBER = 10;
-    private static final int DATABASE_VERSION = 2;
+    private static int KEEP_LAST_IMAGES_NUMBER = 50;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "Images.db";
     private static final String IMAGES_TABLE_NAME = "Images";
     public static final String IMAGES_COLUMN_ID = "_id";
     public static final String IMAGES_COLUMN_URL = "url";
     public static final String IMAGES_COLUMN_IMAGE = "image";
     public static final String IMAGES_COLUMN_DATE_INSERTED = "inserted_at";
+    public static final String IMAGES_COLUMN_LINKPAGE = "linkPage";
     public static final String IMAGES_COLUMN_PROVIDER = "provider";
     private static final String IMAGES_LAST_IMAGES_LIMIT = "10";
     static final String CREATE_IMAGES_TABLE = "CREATE TABLE '" + IMAGES_TABLE_NAME + "' (" +
@@ -27,6 +29,7 @@ public class ImageStorage {
             "'url' TEXT UNIQ, " +
             "'inserted_at' INTEGER default (strftime('%s','now'))," +
             "'provider' TEXT default ''," +
+            "'linkPage' TEXT default ''," +
             "'image' BLOB" +
             ")";
 
@@ -42,7 +45,10 @@ public class ImageStorage {
 
 
     static final String INSERT_IMAGE_STMNT = "INSERT INTO " + IMAGES_TABLE_NAME + " (" +
-            IMAGES_COLUMN_URL + "," + IMAGES_COLUMN_PROVIDER + "," + IMAGES_COLUMN_IMAGE + ") VALUES(?,?,?)";
+            IMAGES_COLUMN_URL + ","
+            + IMAGES_COLUMN_PROVIDER + ","
+            + IMAGES_COLUMN_IMAGE + ","
+            + IMAGES_COLUMN_LINKPAGE + ") VALUES(?,?,?,?)";
 
     /*
     there is actuaaly ugly request, but it should works on very small databases
@@ -63,7 +69,7 @@ public class ImageStorage {
                 null,
                 null
         );
-        if (c.getCount() >0){
+        if (c.getCount() > 0) {
             return true;
         }
         c.close();
@@ -71,19 +77,20 @@ public class ImageStorage {
     }
 
     /**
-     *
-     * @param url - Image url
+     * @param url      - ImageDescription url
      * @param provider - String name human readable of the image provider like Flickr, natgeo, gopro...
-     * @param buffer - bunary data of the image
+     * @param linkPage - String link
+     * @param buffer   - bunary data of the image
      */
-    public void putImage(String url, String provider, byte[] buffer) {
+    public void putImage(String url, String provider, String linkPage, byte[] buffer) {
         //put image with now date
         SQLiteDatabase db = mImageDBHelper.getWritableDatabase();
         if (db != null) {
             SQLiteStatement insertStmt = db.compileStatement(INSERT_IMAGE_STMNT);
-            insertStmt.bindString(1, url);
+            insertStmt.bindString(1,url );
             insertStmt.bindString(2, provider);
             insertStmt.bindBlob(3, buffer);
+            insertStmt.bindString(4, linkPage);
             insertStmt.execute();
             insertStmt.clearBindings();
         }
@@ -92,23 +99,23 @@ public class ImageStorage {
 
     public int deleteImage(long id) {
         SQLiteDatabase db = mImageDBHelper.getWritableDatabase();
-        if (db!=null) {
+        if (db != null) {
             return db.delete(IMAGES_TABLE_NAME, IMAGES_COLUMN_ID + "=?", new String[]{Long.toString(id)});
         }
         return -1;
     }
 
     /**
-     * @param id - int, Image id
-     * @return Image object
+     * @param id - int, ImageDescription id
+     * @return ImageDescription object
      */
-    public Image getImageById(long id) {
-        Image retImage = null;
+    public ImageDescription getImageById(long id) {
+        ImageDescription retImage = null;
         SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
         String where = Long.toString(id);
         Cursor c = db.query(IMAGES_TABLE_NAME,
                 new String[]{IMAGES_COLUMN_IMAGE, IMAGES_COLUMN_DATE_INSERTED,
-                        IMAGES_COLUMN_URL, IMAGES_COLUMN_PROVIDER},
+                        IMAGES_COLUMN_URL, IMAGES_COLUMN_PROVIDER, IMAGES_COLUMN_LINKPAGE},
                 IMAGES_COLUMN_ID + " = ?",
                 new String[]{where},
                 null,
@@ -118,16 +125,16 @@ public class ImageStorage {
         if (c.moveToNext()) {
 
             byte[] b = c.getBlob(0);
-            if (b != null) {
+            if (b != null && b.length>1) {
                 retImage =
-                        new Image(c.getString(2), c.getInt(1), c.getString(3), b);
+                        new ImageDescription(c.getString(2), c.getInt(1), c.getString(3), c.getString(4), b);
             }
         }
         return retImage;
     }
 
     /**
-     * @return ArrayList<Image> - array list of images
+     * @return ArrayList<ImageDescription> - array list of images
      */
     public Cursor getLastImagesCursor() {
         SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
@@ -158,8 +165,16 @@ public class ImageStorage {
         @Override
         public synchronized void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (oldVersion == 1 && newVersion == 2) {
-                db.execSQL("DROP TABLE IF EXISTS Images");
+                db.execSQL("DROP TABLE IF EXISTS " + IMAGES_TABLE_NAME);
                 this.onCreate(db);
+            } else if (oldVersion == 2 && newVersion == 3) {
+
+                try {
+                    db.execSQL("Alter table " + IMAGES_TABLE_NAME + " add column '" + IMAGES_COLUMN_LINKPAGE + "' TEXT default ''");
+                } catch (SQLException e) {
+                    db.execSQL("DROP TABLE IF EXISTS " + IMAGES_TABLE_NAME);
+                    this.onCreate(db);
+                }
             }
         }
     }

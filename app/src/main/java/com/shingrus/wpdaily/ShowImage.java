@@ -9,10 +9,10 @@ import android.widget.ImageView;
 
 /**
  * Created by shingrus on 14/12/15.
- * Shows an Image from stored images
+ * Shows an ImageDescription from stored images
  */
 public class ShowImage extends AppCompatActivity {
-    private Image image;
+    private ImageDescription image;
     private ImageView imageView;
     public static final String IMAGE_ID_KEY = "image_id";
 
@@ -37,19 +37,19 @@ public class ShowImage extends AppCompatActivity {
 
         final ImageStorage storage = ImageStorage.getInstance();
 
-        new AsyncTask<Long, Void, Image>() {
+        new AsyncTask<Long, Void, ImageDescription>() {
 
             @Override
-            protected Image doInBackground(Long... id) {
+            protected ImageDescription doInBackground(Long... id) {
                 return storage.getImageById(id[0]);
             }
 
 
             @Override
-            protected void onPostExecute(Image image) {
-                if (image != null) {
-                    ShowImage.this.image = image;
-                    byte rawImage[] = image.getData();
+            protected void onPostExecute(ImageDescription imageDescription) {
+                if (imageDescription != null) {
+                    ShowImage.this.image = imageDescription;
+                    byte rawImage[] = imageDescription.getData();
                     Bitmap bmp = BitmapFactory.decodeByteArray(rawImage, 0,rawImage.length);
                     imageView.setImageBitmap(bmp);
                 }
