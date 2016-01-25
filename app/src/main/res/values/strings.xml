@@ -34,5 +34,6 @@
     <string name="ImageContentDescription">Image</string>
     <string name="delete_menuitem">Delete</string>
     <string name="aboutKey" translatable="false">aboutPreference</string>
+    <string name="ShareToTitle">Share Url...</string>
 
 </resources>

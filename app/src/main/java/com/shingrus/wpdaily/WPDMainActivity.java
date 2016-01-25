@@ -93,8 +93,8 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
             protected Cursor doInBackground(Long... imageId) {
                 ImageStorage storage = ImageStorage.getInstance();
                 int deleteResult = storage.deleteImage(imageId[0]);
-                if (deleteResult>0) {
-                    Log.d(_log_tag, "Removed images number: " +deleteResult);
+                if (deleteResult > 0) {
+                    Log.d(_log_tag, "Removed images number: " + deleteResult);
                     return storage.getLastImagesCursor();
                 }
                 return null;
@@ -162,10 +162,24 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_action_delete:
+            case R.id.menu_action_delete: {
                 AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                 deleteImage(info.id);
                 return true;
+            }
+            case R.id.menu_action_share: {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                String link = imageCursorAdapter.getLinkPage(info.position);
+                if (link != null) {
+
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, link);
+                    sendIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(sendIntent, getText(R.string.ShareToTitle)));
+                }
+                return true;
+            }
         }
 
         return super.onContextItemSelected(item);

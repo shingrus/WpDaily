@@ -38,7 +38,18 @@ public class ImageCursorAdapter extends CursorAdapter {
 
     }
 
-    private static int image_idx=-1, date_idx=-1, provider_idx=-1;
+    public String getLinkPage(int position) {
+        Cursor c = getCursor();
+        if (c!=null) {
+            if (c.moveToPosition(position)) {
+                return c.getString(linkPage_idx);
+            }
+        }
+        return null;
+    }
+
+
+    private static int image_idx=-1, date_idx=-1, provider_idx=-1, linkPage_idx=-1;
     @Override
     public void bindView(View view, Context ctx, Cursor c) {
         ImageView iv = (ImageView) view.findViewById(R.id.ItemImageId);
@@ -48,6 +59,8 @@ public class ImageCursorAdapter extends CursorAdapter {
             date_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_DATE_INSERTED);
         if (provider_idx==-1)
             provider_idx=c.getColumnIndex(ImageStorage.IMAGES_COLUMN_PROVIDER);
+        if (linkPage_idx==-1)
+            linkPage_idx =c.getColumnIndex(ImageStorage.IMAGES_COLUMN_LINKPAGE);
 
         byte[] image = c.getBlob(image_idx);
         if (image != null && image.length > 0) {

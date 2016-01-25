@@ -140,7 +140,8 @@ public class ImageStorage {
         SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
 
         return db.query(IMAGES_TABLE_NAME,
-                new String[]{IMAGES_COLUMN_IMAGE, IMAGES_COLUMN_DATE_INSERTED, IMAGES_COLUMN_URL, IMAGES_COLUMN_PROVIDER, IMAGES_COLUMN_ID},
+                new String[]{IMAGES_COLUMN_IMAGE, IMAGES_COLUMN_DATE_INSERTED,
+                        IMAGES_COLUMN_URL, IMAGES_COLUMN_PROVIDER, IMAGES_COLUMN_ID,IMAGES_COLUMN_LINKPAGE},
                 IMAGES_COLUMN_DATE_INSERTED + "> ?",
                 new String[]{"0"},
                 null,
