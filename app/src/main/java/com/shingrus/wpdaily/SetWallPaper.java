@@ -185,6 +185,7 @@ public final class SetWallPaper {
     private void initProviders() {
         providers.add(new VokrugSvetaProvider());
         providers.add(new NationalGeographicProvider());
+        providers.add(new BingProvider());
     }
 
 
