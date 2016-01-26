@@ -20,6 +20,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by shingrus on 24/11/15.
@@ -38,7 +39,7 @@ public final class SetWallPaper {
 
     private final List<WallpaperProvider> providers = new ArrayList<>();
     WallpaperProvider currentProvider = null;
-    int currentProviderPos;
+//    int currentProviderPos;
 
 
 //    private static final String LAST_IMAGE_URL_KEY = "last_image_url";
@@ -127,7 +128,6 @@ public final class SetWallPaper {
     private synchronized UpdateResult setWallPaperImage(ImageDescription imageDescription) {
         UpdateResult retVal = UpdateResult.FAIL;
         ImageStorage storage = ImageStorage.getInstance(appContext);
-
         if (!storage.isUrlAlreadyDownloaded(imageDescription.getUrl())) {
             try {
                 URL url = new URL(imageDescription.getUrl());
@@ -137,11 +137,8 @@ public final class SetWallPaper {
                 if (setWallPaperImage(imageBuf)) {
                     Log.d(_log_tag, "Set new image:" + url);
 
-                    //store ImageDescription
-
                     storage.putImage(imageDescription.getUrl(), currentProvider.getWallpaperProvider(),
                             imageDescription.getLinkPage(), imageBuf);
-
                     retVal = UpdateResult.SUCCESS;
                 }
 
@@ -161,11 +158,22 @@ public final class SetWallPaper {
         UpdateResult retVal = UpdateResult.FAIL;
         try {
             //chose provider
-            currentProvider = setNextProvider();
-            ImageDescription imageDescription = currentProvider.GetLastWallpaperLink();
-            if (imageDescription != null) {
-                retVal = setWallPaperImage(imageDescription);
+            //need to keep last provider
+            Random r = new Random();
+            for (int count = providers.size(), i = r.nextInt(count); count >0; count--,i++) {
+                currentProvider = providers.get(i%providers.size());
+                Log.d(_log_tag,"Check provider:" + currentProvider+ "; i:"+i+";count: "+count);
+                ImageDescription imageDescription = currentProvider.GetLastWallpaperLink();
+                if (imageDescription != null) {
+                    retVal = setWallPaperImage(imageDescription);
+                    if (retVal==UpdateResult.SUCCESS || retVal == UpdateResult.NETWORK_FAIL)
+                        break;
+                }
+                else {
+                    retVal = UpdateResult.PROVIDER_FAIL;
+                }
             }
+
         } catch (IOException e) {
             retVal = UpdateResult.NETWORK_FAIL;
             Log.d(_log_tag, "IO:Exception" + e);
@@ -174,17 +182,9 @@ public final class SetWallPaper {
         return retVal;
     }
 
-    private WallpaperProvider setNextProvider() {
-        WallpaperProvider prov = providers.get(currentProviderPos++);
-        currentProviderPos %= providers.size();
-        Log.d(_log_tag, "Next provider will be: " + prov);
-        return prov;
-    }
-
     private void initProviders() {
         providers.add(new VokrugSvetaProvider());
         providers.add(new NationalGeographicProvider());
-        currentProviderPos = 0;
     }
 
 
