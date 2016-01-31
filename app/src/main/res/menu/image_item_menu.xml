@@ -3,15 +3,19 @@
     <item
         android:id="@+id/menu_action_share"
         android:enabled="true"
-        android:title="@string/share_menuitem" />
+        android:title="@string/menuitem_share" />
+    <item
+        android:id="@+id/menu_action_browser"
+        android:enabled="true"
+        android:title="@string/menuitem_browser" />
     <item
         android:id="@+id/menu_action_set_wallpaper"
         android:enabled="false"
-        android:title="@string/setwp_menuitem" />
+        android:title="@string/menuitem_setwp" />
     <item
         android:id="@+id/menu_action_delete"
         android:enabled="true"
-        android:title="@string/delete_menuitem" />
+        android:title="@string/menuitem_delete" />
 
 
 </menu>

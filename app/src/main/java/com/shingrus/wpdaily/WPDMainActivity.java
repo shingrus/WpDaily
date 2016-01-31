@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.media.Image;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -132,6 +134,23 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         }.execute(null, null, null);
     }
 
+    private void setAsWallpaper(long id) {
+        new AsyncTask<Long, Void, ImageDescription>() {
+            @Override
+            protected void onPostExecute(ImageDescription imageDescription) {
+                if (imageDescription != null) {
+                    SetWallPaper.getSetWallPaper(null).setWallPaperImage(imageDescription.getData());
+                }
+            }
+
+            @Override
+            protected ImageDescription doInBackground(Long... params) {
+                ImageDescription retVal = ImageStorage.getInstance().getImageById(params[0]);
+                return retVal;
+            }
+        }.execute(id);
+    }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -167,17 +186,30 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
                 deleteImage(info.id);
                 return true;
             }
-            case R.id.menu_action_share: {
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
+            case R.id.menu_action_share:
+            case R.id.menu_action_browser: {
                 AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                 String link = imageCursorAdapter.getLinkPage(info.position);
                 if (link != null) {
 
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, link);
-                    sendIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(sendIntent, getText(R.string.ShareToTitle)));
+                    Intent sendIntent;
+                    if (item.getItemId() == R.id.menu_action_browser) {
+                        sendIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+                        startActivity(sendIntent);
+                    } else {
+                        sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, link);
+                        sendIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(sendIntent, getText(R.string.ShareToTitle)));
+                    }
+
                 }
+                return true;
+            }
+            case R.id.menu_action_set_wallpaper: {
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                setAsWallpaper(info.id);
                 return true;
             }
         }
