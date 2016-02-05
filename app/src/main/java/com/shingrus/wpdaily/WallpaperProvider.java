@@ -7,7 +7,7 @@ import java.net.URL;
  * Created by shingrus on 22/01/16.
  * Interface for the abstract wallpaper source
  */
-public interface WallpaperProvider {
+interface WallpaperProvider {
     String getWallpaperProvider();
     ImageDescription GetLastWallpaperLink() throws IOException;
 }

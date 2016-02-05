@@ -20,8 +20,8 @@ import java.util.Date;
  * Created by shingrus on 09/12/15.
  */
 public class ImageCursorAdapter extends CursorAdapter {
-    DateFormat df;
-    LayoutInflater inflater;
+    private DateFormat df;
+    private LayoutInflater inflater;
 
     private static final String _log_tag = "WPD/ImageCursor";
 

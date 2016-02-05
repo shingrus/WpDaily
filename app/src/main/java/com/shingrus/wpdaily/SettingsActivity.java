@@ -38,9 +38,9 @@ import java.util.List;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
-    static String updateFreqKey = "";
-    static String onBootEnabledKey = "";
-    static String onAutoUpdateEnableKey = "";
+    private static String updateFreqKey = "";
+    private static String onBootEnabledKey = "";
+    private static String onAutoUpdateEnableKey = "";
 //    static boolean onBootEnabled = false;
 
     /**

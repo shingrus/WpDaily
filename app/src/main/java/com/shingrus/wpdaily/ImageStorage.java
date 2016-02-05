@@ -34,7 +34,7 @@ public class ImageStorage {
     public static final String IMAGES_COLUMN_LINKPAGE = "linkPage";
     public static final String IMAGES_COLUMN_PROVIDER = "provider";
     private static final String IMAGES_LAST_IMAGES_LIMIT = "10";
-    static final String CREATE_IMAGES_TABLE = "CREATE TABLE '" + IMAGES_TABLE_NAME + "' (" +
+    private static final String CREATE_IMAGES_TABLE = "CREATE TABLE '" + IMAGES_TABLE_NAME + "' (" +
             "'_id' INTEGER PRIMARY KEY AUTOINCREMENT," +
             "'url' TEXT UNIQ, " +
             "'inserted_at' INTEGER default (strftime('%s','now'))," +
@@ -55,7 +55,7 @@ public class ImageStorage {
     }
 
 
-    static final String INSERT_IMAGE_STMNT = "INSERT INTO " + IMAGES_TABLE_NAME + " (" +
+    private static final String INSERT_IMAGE_STMNT = "INSERT INTO " + IMAGES_TABLE_NAME + " (" +
             IMAGES_COLUMN_URL + ","
             + IMAGES_COLUMN_PROVIDER + ","
             + IMAGES_COLUMN_IMAGE + ","
@@ -214,18 +214,18 @@ public class ImageStorage {
         //Create Path to save Image
         Uri retVal = null;
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + appFolder); //Creates app specific folder
-        path.mkdirs();
-        try {
-            File imageFile = File.createTempFile("wpdimage","",path);
-            FileOutputStream out = new FileOutputStream(imageFile);
-            bm.compress(Bitmap.CompressFormat.PNG, 100, out); // Compress Image
-            out.flush();
-            out.close();
-            retVal = Uri.fromFile(imageFile);
-        } catch (IOException e) {
-         //do nothing
+        if (path.mkdirs() || path.isDirectory()) {
+            try {
+                File imageFile = File.createTempFile("wpdimage", "", path);
+                FileOutputStream out = new FileOutputStream(imageFile);
+                bm.compress(Bitmap.CompressFormat.PNG, 100, out); // Compress Image
+                out.flush();
+                out.close();
+                retVal = Uri.fromFile(imageFile);
+            } catch (IOException e) {
+                //do nothing
+            }
         }
-
         return retVal;
     }
 }

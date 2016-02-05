@@ -25,9 +25,10 @@ import java.util.Random;
 public final class SetWallPaper {
 
     public static final String WALLPAPER_UPDATE_TIME_KEY = "wallpaper_update_time";
-    Context appContext;
-    static SetWallPaper setWallPaper;
-    static final String _log_tag = "SetWallPaper";
+    public static final int UPDATE_WALLPAPER_PER_SECONDS = 86400;
+    private Context appContext;
+    private static SetWallPaper setWallPaper;
+    private static final String _log_tag = "SetWallPaper";
 
 
     public static final int TIMEOUT_CONNECT = 10000;
@@ -35,7 +36,7 @@ public final class SetWallPaper {
 
 
     private final List<WallpaperProvider> providers = new ArrayList<>();
-    WallpaperProvider currentProvider = null;
+    private WallpaperProvider currentProvider = null;
 //    int currentProviderPos;
 
 
@@ -147,7 +148,7 @@ public final class SetWallPaper {
                 byte[] imageBuf = getImage(url);
 
                 if (imageBuf.length > 0) {
-                    if (isMoreTimeElapsed(86400))
+                    if (isMoreTimeElapsed(UPDATE_WALLPAPER_PER_SECONDS))
                         setWallPaperImage(imageBuf);
                     Log.d(_log_tag, "Store image but don't update wallpaper.");
 

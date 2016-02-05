@@ -17,8 +17,8 @@ public class WpDailyApplication extends Application {
     private static final String _log_tag = "WPD/WP_APP";
     private static final int DEFAULT_UPDATE_FREQUENCY_H = 6 * 60;
 
-    SetWallPaper setWallPaper;
-    ImageStorage storage;
+    private SetWallPaper setWallPaper;
+    private ImageStorage storage;
 
     public WpDailyApplication() {
         super();

@@ -152,8 +152,7 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 
             @Override
             protected ImageDescription doInBackground(Long... params) {
-                ImageDescription retVal = ImageStorage.getInstance().getImageById(params[0]);
-                return retVal;
+                return ImageStorage.getInstance().getImageById(params[0]);
             }
         }.execute(id);
     }
@@ -169,8 +168,7 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 
                     byte[] imageData = imageDescription.getData();
                     Bitmap bm = BitmapFactory.decodeByteArray(imageData, 0, imageData.length, null);
-                    Uri fileUri = null;
-                    fileUri = ImageStorage.getInstance().saveImageToExternal(bm);
+                    Uri fileUri = ImageStorage.getInstance().saveImageToExternal(bm);
                     if (fileUri != null) {
                         intent = new Intent(Intent.ACTION_SEND);
                         intent.putExtra(Intent.EXTRA_TEXT, imageDescription.getLinkPage());

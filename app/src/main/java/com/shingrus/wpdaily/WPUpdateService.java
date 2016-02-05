@@ -116,7 +116,7 @@ public class WPUpdateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String action = intent.getAction();
+//        String action = intent.getAction();
         Log.d(_log_tag, "Start service job");
 
         //Intent to notify activity about update result
