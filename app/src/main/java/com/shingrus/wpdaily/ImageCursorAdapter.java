@@ -32,9 +32,17 @@ public class ImageCursorAdapter extends CursorAdapter {
 
     }
 
+
+
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return inflater.inflate(R.layout.item_layout, null, false);
+        View rowView = inflater.inflate(R.layout.item_layout, null, false);
+        ViewHolder holder = new ViewHolder();
+        holder.itemDateView = (TextView) rowView.findViewById(R.id.ItemDateId);
+        holder.itemProviderView = (TextView) rowView.findViewById(R.id.ItemProviderId);
+        holder.imageView = (ImageView) rowView.findViewById(R.id.ItemImageId);
+        rowView.setTag(holder);
+        return rowView;
 
     }
 
@@ -48,11 +56,16 @@ public class ImageCursorAdapter extends CursorAdapter {
         return null;
     }
 
+    class ViewHolder {
+        TextView itemDateView, itemProviderView;
+        ImageView imageView;
+    }
 
     private static int image_idx=-1, date_idx=-1, provider_idx=-1, linkPage_idx=-1;
     @Override
     public void bindView(View view, Context ctx, Cursor c) {
-        ImageView iv = (ImageView) view.findViewById(R.id.ItemImageId);
+        ViewHolder holder = (ViewHolder) view.getTag();
+
         if (image_idx ==-1)
             image_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_IMAGE);
         if (date_idx ==-1)
@@ -64,6 +77,8 @@ public class ImageCursorAdapter extends CursorAdapter {
 
         byte[] image = c.getBlob(image_idx);
         if (image != null && image.length > 0) {
+            ImageView iv = holder.imageView;//(ImageView) view.findViewById(R.id.ItemImageId);
+
             int date = c.getInt(date_idx);
             String prov = c.getString(provider_idx);
             long longdate = (long) date * 1000;
@@ -71,10 +86,10 @@ public class ImageCursorAdapter extends CursorAdapter {
             Bitmap origBitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
 
             iv.setImageBitmap(origBitmap);
-            TextView tv = (TextView) view.findViewById(R.id.ItemDateId);
+            TextView tv = holder.itemDateView;//(TextView) view.findViewById(R.id.ItemDateId);
             tv.setText(df.format(new Date(longdate)));
 
-            tv = (TextView) view.findViewById(R.id.ItemProviderId);
+            tv = holder.itemProviderView;//(TextView) view.findViewById(R.id.ItemProviderId);
             tv.setText(prov);
 
         }
