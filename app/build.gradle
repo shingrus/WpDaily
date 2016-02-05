@@ -21,7 +21,7 @@ android {
             applicationId "com.shingrus.wpdaily"
             minSdkVersion 18
             targetSdkVersion 23
-            versionName "Pre-alpha 0.9"
+            versionName "Release 1.0"
         }
         buildTypes {
             release {

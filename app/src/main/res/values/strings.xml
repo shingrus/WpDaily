@@ -24,7 +24,7 @@
     <string name="onBootEnabledKey" translatable="false">onBootEnabled</string>
     <string name="action_settings">Settings</string>
     <string name="ShowImageTitle" />
-    <string name="menuitem_share">Share</string>
+    <string name="menuitem_share">Share photo</string>
     <string name="menuitem_setwp">Set as Wallpaper</string>
     <string name="AutomaticUpdateEnableCheckBoxName">Autoupdate Wallpaper</string>
     <string name="AutoUpdateEnabledKey" translatable="false">automaticUpdateEnabled</string>
@@ -34,7 +34,7 @@
     <string name="ImageContentDescription">Image</string>
     <string name="menuitem_delete">Delete</string>
     <string name="aboutKey" translatable="false">aboutPreference</string>
-    <string name="ShareToTitle">Share Url&#8230;</string>
+    <string name="ShareToTitle">Share Image&#8230;</string>
     <string name="menuitem_browser">Open in Browser&#8230;</string>
 
 </resources>

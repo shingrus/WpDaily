@@ -25,14 +25,14 @@
     <string name="OnBootCheckBoxName">Запускать после растарта</string>
     <string name="action_settings">Settings</string>
     <string name="ShowImageTitle" />
-    <string name="menuitem_share">Поделиться</string>
+    <string name="menuitem_share">Поделиться фото</string>
     <string name="menuitem_setwp">Установить Обои</string>
     <string name="menuitem_delete">Удалить</string>
     <string name="AutomaticUpdateEnableCheckBoxName">Автоматически обновлять фон</string>
     <string name="WelcomeScreenContinueButton">Дальше</string>
     <string name="welcomeText">Фон будет обновляться автоматически каждые 6 часов</string>
     <string name="ImageContentDescription">Изображение</string>
-    <string name="ShareToTitle">Поделиться Url&#8230;</string>
+    <string name="ShareToTitle">Поделиться фото&#8230;</string>
     <string name="menuitem_browser">Открыть в браузере&#8230;</string>
 
 

@@ -176,7 +176,8 @@ public final class SetWallPaper {
         UpdateResult retVal = UpdateResult.FAIL;
         try {
             //chose provider
-            //need to keep last provider
+            //iterate over all providers
+            //starts from random
             Random r = new Random();
             for (int count = providers.size(), i = r.nextInt(count); count > 0; count--, i++) {
                 currentProvider = providers.get(i % providers.size());
@@ -184,8 +185,8 @@ public final class SetWallPaper {
                 ImageDescription imageDescription = currentProvider.GetLastWallpaperLink();
                 if (imageDescription != null) {
                     retVal = setWallPaperImage(imageDescription);
-                    if (retVal == UpdateResult.SUCCESS || retVal == UpdateResult.NETWORK_FAIL)
-                        break;
+//                    if (retVal == UpdateResult.SUCCESS || retVal == UpdateResult.NETWORK_FAIL)
+//                        break;
                 } else {
                     retVal = UpdateResult.PROVIDER_FAIL;
                 }

@@ -6,6 +6,15 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.Environment;
+import android.util.Log;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 /**
@@ -13,7 +22,8 @@ import android.database.sqlite.SQLiteStatement;
  * Created by shingrus on 06/12/15.
  */
 public class ImageStorage {
-    private static int KEEP_LAST_IMAGES_NUMBER = 50;
+    public static final String _log_tag = "ImageStorage";
+    private static String KEEP_LAST_IMAGES_NUMBER = "30";
     private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "Images.db";
     private static final String IMAGES_TABLE_NAME = "Images";
@@ -35,12 +45,13 @@ public class ImageStorage {
 
 
     private static ImageStorage sInstance;
-    //    private Context ctx;
+    private Context mCtx;
     private ImageDBHelper mImageDBHelper;
+    private static final String appFolder = File.separator + "Daily Wallpaper";
 
-    private ImageStorage(Context ctx) {
-//        ctx = context;
-        mImageDBHelper = new ImageDBHelper(ctx);
+    private ImageStorage(Context context) {
+        mCtx = context;
+        mImageDBHelper = new ImageDBHelper(mCtx);
     }
 
 
@@ -87,12 +98,13 @@ public class ImageStorage {
         SQLiteDatabase db = mImageDBHelper.getWritableDatabase();
         if (db != null) {
             SQLiteStatement insertStmt = db.compileStatement(INSERT_IMAGE_STMNT);
-            insertStmt.bindString(1,url );
+            insertStmt.bindString(1, url);
             insertStmt.bindString(2, provider);
             insertStmt.bindBlob(3, buffer);
             insertStmt.bindString(4, linkPage);
             insertStmt.execute();
             insertStmt.clearBindings();
+            deleteOldImages();
         }
 
     }
@@ -103,6 +115,13 @@ public class ImageStorage {
             return db.delete(IMAGES_TABLE_NAME, IMAGES_COLUMN_ID + "=?", new String[]{Long.toString(id)});
         }
         return -1;
+    }
+
+    private void deleteOldImages() {
+        SQLiteDatabase db = mImageDBHelper.getWritableDatabase();
+        if (db != null) {
+            db.execSQL(DROP_OLD_RECORDS);
+        }
     }
 
     /**
@@ -125,7 +144,7 @@ public class ImageStorage {
         if (c.moveToNext()) {
 
             byte[] b = c.getBlob(0);
-            if (b != null && b.length>1) {
+            if (b != null && b.length > 1) {
                 retImage =
                         new ImageDescription(c.getString(2), c.getInt(1), c.getString(3), c.getString(4), b);
             }
@@ -141,7 +160,7 @@ public class ImageStorage {
 
         return db.query(IMAGES_TABLE_NAME,
                 new String[]{IMAGES_COLUMN_IMAGE, IMAGES_COLUMN_DATE_INSERTED,
-                        IMAGES_COLUMN_URL, IMAGES_COLUMN_PROVIDER, IMAGES_COLUMN_ID,IMAGES_COLUMN_LINKPAGE},
+                        IMAGES_COLUMN_URL, IMAGES_COLUMN_PROVIDER, IMAGES_COLUMN_ID, IMAGES_COLUMN_LINKPAGE},
                 IMAGES_COLUMN_DATE_INSERTED + "> ?",
                 new String[]{"0"},
                 null,
@@ -189,6 +208,25 @@ public class ImageStorage {
             sInstance = new ImageStorage(context);
         }
         return sInstance;
+    }
+
+    public Uri saveImageToExternal(Bitmap bm) {
+        //Create Path to save Image
+        Uri retVal = null;
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + appFolder); //Creates app specific folder
+        path.mkdirs();
+        try {
+            File imageFile = File.createTempFile("wpdimage","",path);
+            FileOutputStream out = new FileOutputStream(imageFile);
+            bm.compress(Bitmap.CompressFormat.PNG, 100, out); // Compress Image
+            out.flush();
+            out.close();
+            retVal = Uri.fromFile(imageFile);
+        } catch (IOException e) {
+         //do nothing
+        }
+
+        return retVal;
     }
 }
 
