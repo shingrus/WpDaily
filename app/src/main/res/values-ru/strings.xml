@@ -34,7 +34,7 @@
     <string name="ImageContentDescription">Изображение</string>
     <string name="ShareToTitle">Поделиться фото&#8230;</string>
     <string name="menuitem_browser">Открыть в браузере&#8230;</string>
-
+    <string name="toastWPChanged">Новый фон установлен.</string>
 
 
 </resources>

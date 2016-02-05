@@ -36,5 +36,6 @@
     <string name="aboutKey" translatable="false">aboutPreference</string>
     <string name="ShareToTitle">Share Image&#8230;</string>
     <string name="menuitem_browser">Open in Browser&#8230;</string>
+    <string name="toastWPChanged">Wallpaper has been changed.</string>
 
 </resources>

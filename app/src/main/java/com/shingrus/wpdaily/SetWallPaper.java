@@ -55,6 +55,9 @@ public final class SetWallPaper {
         initProviders();
     }
 
+    public static SetWallPaper getSetWallPaper() {
+        return getSetWallPaper(null);
+    }
     public static synchronized SetWallPaper getSetWallPaper(Context ctx) {
         if (setWallPaper == null && ctx != null) {
             setWallPaper = new SetWallPaper(ctx);

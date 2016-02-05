@@ -10,7 +10,7 @@
         android:title="@string/menuitem_browser" />
     <item
         android:id="@+id/menu_action_set_wallpaper"
-        android:enabled="false"
+        android:enabled="true"
         android:title="@string/menuitem_setwp" />
     <item
         android:id="@+id/menu_action_delete"

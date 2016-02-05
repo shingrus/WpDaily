@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,7 +147,12 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
             @Override
             protected void onPostExecute(ImageDescription imageDescription) {
                 if (imageDescription != null) {
-                    SetWallPaper.getSetWallPaper(null).setWallPaperImage(imageDescription.getData());
+
+                    if(SetWallPaper.getSetWallPaper().setWallPaperImage(imageDescription.getData())) {
+                        //wallpaper has been set successfully
+                        Toast t = Toast.makeText(getApplicationContext(),getString(R.string.toastWPChanged),Toast.LENGTH_SHORT);
+                        t.show();
+                    }
                 }
             }
 
