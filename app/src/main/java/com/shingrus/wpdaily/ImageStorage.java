@@ -216,7 +216,7 @@ public class ImageStorage {
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + appFolder); //Creates app specific folder
         if (path.mkdirs() || path.isDirectory()) {
             try {
-                File imageFile = File.createTempFile("wpdimage", "", path);
+                File imageFile = File.createTempFile("wpdimage", ".png", path);
                 FileOutputStream out = new FileOutputStream(imageFile);
                 bm.compress(Bitmap.CompressFormat.PNG, 100, out); // Compress Image
                 out.flush();
