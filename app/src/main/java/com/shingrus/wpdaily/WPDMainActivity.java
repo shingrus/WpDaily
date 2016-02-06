@@ -5,15 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,8 +27,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
+
+import com.facebook.FacebookSdk;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 
 public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -41,6 +42,7 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
     private UpdateReceiver updateReceiver = new UpdateReceiver();
     IntentFilter filter = new IntentFilter(WPUpdateService.UPDATE_ACTIVITY_ACTION);
     public static final String SKIP_WELCOME_CHECK_ACTION = "com.shingrus.wpdaily.action.skip_welcome";
+    private boolean isFBinstalled = false;
 
     /**
      * Implements OnRefreshListener
@@ -148,9 +150,9 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
             protected void onPostExecute(ImageDescription imageDescription) {
                 if (imageDescription != null) {
 
-                    if(SetWallPaper.getSetWallPaper().setWallPaperImage(imageDescription.getData())) {
+                    if (SetWallPaper.getSetWallPaper().setWallPaperImage(imageDescription.getData())) {
                         //wallpaper has been set successfully
-                        Toast t = Toast.makeText(getApplicationContext(),getString(R.string.toastWPChanged),Toast.LENGTH_SHORT);
+                        Toast t = Toast.makeText(getApplicationContext(), getString(R.string.toastWPChanged), Toast.LENGTH_SHORT);
                         t.show();
                     }
                 }
@@ -163,8 +165,14 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         }.execute(id);
     }
 
-    private void shareAsImageOverMediaStorage(long id) {
+    private void shareAsImageOverExternalStorage(long id) {
         new AsyncTask<Long, Void, Intent>() {
+            @Override
+            protected void onPostExecute(Intent intent) {
+                if (intent != null) {
+                    startActivity(Intent.createChooser(intent, getText(R.string.ShareToTitle)));
+                }
+            }
 
             @Override
             protected Intent doInBackground(Long... params) {
@@ -184,11 +192,33 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
                 }
                 return intent;
             }
+        }.execute(id);
+    }
+    private void shareToFacebook(long id) {
+        new AsyncTask<Long, Void, ShareLinkContent>() {
 
             @Override
-            protected void onPostExecute(Intent intent) {
-                if (intent != null) {
-                    startActivity(Intent.createChooser(intent, getText(R.string.ShareToTitle)));
+            protected ShareLinkContent doInBackground(Long... params) {
+                ShareLinkContent linkContent = null;
+                ImageDescription imageDescription = ImageStorage.getInstance().getImageById(params[0]);
+                if (imageDescription != null ) {
+
+                    Uri contentUri = Uri.parse(imageDescription.getLinkPage());
+                    Uri imageUri = Uri.parse(imageDescription.getUrl());
+                    linkContent = new ShareLinkContent.Builder()
+                            .setImageUrl(imageUri)
+                            .setContentUrl(contentUri)
+                            .build();
+
+                }
+                return linkContent;
+            }
+
+            @Override
+            protected void onPostExecute(ShareLinkContent linkContent) {
+                if (linkContent != null) {
+                    ShareDialog.show(WPDMainActivity.this, linkContent);
+
                 }
 
             }
@@ -202,6 +232,10 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         if (v.getId() == R.id.images_list) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.image_item_menu, menu);
+            if (!isFBinstalled) {
+                Log.d(_log_tag, "Remove facebook Item");
+                menu.getItem(0).setEnabled(false);
+            }
         }
     }
 
@@ -232,8 +266,12 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
                 deleteImage(info.id);
                 return true;
             }
-            case R.id.menu_action_share: {
-                shareAsImageOverMediaStorage(info.id);
+            case R.id.menu_action_sharetoFB: {
+                shareToFacebook(info.id);
+                return true;
+            }
+            case R.id.menu_action_shareimage: {
+                shareAsImageOverExternalStorage(info.id);
                 return true;
             }
             case R.id.menu_action_browser: {
@@ -257,11 +295,25 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
         return super.onContextItemSelected(item);
     }
 
+    private boolean checkFBinstalled () {
+        try{
+            ApplicationInfo info = getPackageManager().
+                    getApplicationInfo("com.facebook.katana", 0 );
+            Log.d(_log_tag, "Facebook app is installed");
+            return true;
+        } catch( PackageManager.NameNotFoundException e ) {
+            Log.d(_log_tag, "No Facebook app");
+        }
+        return false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         Intent startIntent = getIntent();
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        isFBinstalled = checkFBinstalled();
         if (!SKIP_WELCOME_CHECK_ACTION.equals(startIntent.getAction()) &&
                 !pref.getBoolean(getString(R.string.WelcomeScreenShowedKey), false)) {
             Intent newActivity = new Intent(this, WelcomeActivity.class);
@@ -274,13 +326,7 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
             ListView listView = (ListView) findViewById(R.id.images_list);
             imageCursorAdapter = new ImageCursorAdapter(WPDMainActivity.this, null);
             listView.setAdapter(imageCursorAdapter);
-//            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//                @Override
-//                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                    return true;
-//                }
-//            });
+
             registerForContextMenu(listView);
 
 

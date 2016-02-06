@@ -24,7 +24,7 @@
     <string name="onBootEnabledKey" translatable="false">onBootEnabled</string>
     <string name="action_settings">Settings</string>
     <string name="ShowImageTitle" />
-    <string name="menuitem_share">Share photo</string>
+    <string name="menuitem_sharetoFB">Share photo to Facebook</string>
     <string name="menuitem_setwp">Set as Wallpaper</string>
     <string name="AutomaticUpdateEnableCheckBoxName">Autoupdate Wallpaper</string>
     <string name="AutoUpdateEnabledKey" translatable="false">automaticUpdateEnabled</string>
@@ -37,5 +37,6 @@
     <string name="ShareToTitle">Share Image&#8230;</string>
     <string name="menuitem_browser">Open in Browser&#8230;</string>
     <string name="toastWPChanged">Wallpaper has been changed.</string>
-
+    <string name="facebook_app_id" translatable="false">585927454887632</string>
+    <string name="menuitem_shareimage">Share image</string>
 </resources>
