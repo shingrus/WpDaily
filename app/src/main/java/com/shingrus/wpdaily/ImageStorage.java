@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 public class ImageStorage {
     public static final String _log_tag = "ImageStorage";
-    private static String KEEP_LAST_IMAGES_NUMBER = "30";
+
     private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "Images.db";
     private static final String IMAGES_TABLE_NAME = "Images";
@@ -33,7 +33,8 @@ public class ImageStorage {
     public static final String IMAGES_COLUMN_DATE_INSERTED = "inserted_at";
     public static final String IMAGES_COLUMN_LINKPAGE = "linkPage";
     public static final String IMAGES_COLUMN_PROVIDER = "provider";
-    private static final String IMAGES_LAST_IMAGES_LIMIT = "10";
+    private static String KEEP_LAST_IMAGES_NUMBER = "30";
+    private static final String IMAGES_LAST_IMAGES_LIMIT = KEEP_LAST_IMAGES_NUMBER;
     private static final String CREATE_IMAGES_TABLE = "CREATE TABLE '" + IMAGES_TABLE_NAME + "' (" +
             "'_id' INTEGER PRIMARY KEY AUTOINCREMENT," +
             "'url' TEXT UNIQ, " +
