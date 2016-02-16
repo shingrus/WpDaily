@@ -93,6 +93,7 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 
     private void updateImages() {
         Intent intent = new Intent(this.getApplicationContext(), WPUpdateService.class);
+        mSwipeRefreshLayout.setEnabled(true);
         startService(intent);
         isUpdating = true;
 

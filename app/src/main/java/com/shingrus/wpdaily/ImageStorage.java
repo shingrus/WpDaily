@@ -71,20 +71,22 @@ public class ImageStorage {
             IMAGES_TABLE_NAME + " ORDER BY " + IMAGES_COLUMN_DATE_INSERTED + " Desc limit " + KEEP_LAST_IMAGES_NUMBER + ")";
 
 
-    public boolean isUrlAlreadyDownloaded(String url) {
-        SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
-        Cursor c = db.query(IMAGES_TABLE_NAME,
-                new String[]{IMAGES_COLUMN_ID},
-                IMAGES_COLUMN_URL + " = ?",
-                new String[]{url},
-                null,
-                null,
-                null
-        );
-        if (c.getCount() > 0) {
-            return true;
+    public boolean isUrlAlreadyDownloaded(ImageDescription imageDescription) {
+        if (imageDescription!=null && imageDescription.getLinkPage()!=null) {
+            SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
+            Cursor c = db.query(IMAGES_TABLE_NAME,
+                    new String[]{IMAGES_COLUMN_ID},
+                    IMAGES_COLUMN_LINKPAGE + " = ?",
+                    new String[]{imageDescription.getLinkPage()},
+                    null,
+                    null,
+                    null
+            );
+            if (c.getCount() > 0) {
+                return true;
+            }
+            c.close();
         }
-        c.close();
         return false;
     }
 

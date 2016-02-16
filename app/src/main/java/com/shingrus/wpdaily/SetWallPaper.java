@@ -144,7 +144,7 @@ public final class SetWallPaper {
     private synchronized UpdateResult setWallPaperImage(ImageDescription imageDescription) {
         UpdateResult retVal = UpdateResult.FAIL;
         ImageStorage storage = ImageStorage.getInstance(appContext);
-        if (!storage.isUrlAlreadyDownloaded(imageDescription.getUrl())) {
+        if (!storage.isUrlAlreadyDownloaded(imageDescription)) {
             try {
                 URL url = new URL(imageDescription.getUrl());
 
@@ -208,6 +208,7 @@ public final class SetWallPaper {
         providers.add(new VokrugSvetaProvider());
         providers.add(new NationalGeographicProvider());
         providers.add(new BingProvider());
+        providers.add(new GoProProvider());
     }
 
 
