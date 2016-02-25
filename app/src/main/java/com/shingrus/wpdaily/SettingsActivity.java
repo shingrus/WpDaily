@@ -21,6 +21,7 @@ import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 
 import java.util.List;
 
@@ -39,6 +40,17 @@ import java.util.List;
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static String updateFreqKey = "";
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private static String onBootEnabledKey = "";
     private static String onAutoUpdateEnableKey = "";
 //    static boolean onBootEnabled = false;
