@@ -128,12 +128,14 @@ public final class SetWallPaper {
         return retVal;
     }
 
-    private boolean isMoreTimeElapsed(long seconds) {
+    private boolean isMoreTimeElapsed() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(appContext);
         long updateTime = pref.getLong(WALLPAPER_UPDATE_TIME_KEY, 0);
+        String updateString = pref.getString(appContext.getString(R.string.update_freq_list),"0");
+        long updatePerSeconds  = Long.parseLong(updateString);
         long now = System.currentTimeMillis() / 1000;
         Log.d(_log_tag, "Check update time: " + updateTime + "vs" + now);
-        return (now - updateTime > seconds);
+        return (now - updateTime > updatePerSeconds);
 
     }
 
@@ -151,7 +153,7 @@ public final class SetWallPaper {
                 byte[] imageBuf = getImage(url);
 
                 if (imageBuf.length > 0) {
-                    if (isMoreTimeElapsed(UPDATE_WALLPAPER_PER_SECONDS))
+                    if (isMoreTimeElapsed())
                         setWallPaperImage(imageBuf);
                     Log.d(_log_tag, "Store image but don't update wallpaper.");
 
