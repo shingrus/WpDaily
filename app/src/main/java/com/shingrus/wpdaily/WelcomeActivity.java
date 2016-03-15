@@ -1,5 +1,6 @@
 package com.shingrus.wpdaily;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,26 +16,30 @@ import android.widget.Button;
  * Asks about automatic change of the wallpaper
  */
 public class WelcomeActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-        Button welcomeButton = (Button) findViewById(R.id.welcomeContinueButton);
-        welcomeButton.setOnClickListener(new View.OnClickListener() {
+        Button welcomeYesButton = (Button) findViewById(R.id.welcomeYesButton);
+        Button welcomeNoButton = (Button) findViewById(R.id.welcomeNoButton);
+        View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(WelcomeActivity.this);
                 SharedPreferences.Editor editor = pref.edit();
-                SwitchCompat sw = (SwitchCompat) findViewById(R.id.welcomeEnableAutoUpdate);
-                editor.putBoolean(getString(R.string.WelcomeScreenShowedKey),true);
-                editor.putBoolean(getString(R.string.AutoUpdateEnabledKey), sw.isChecked());
-                editor.apply();
 
+                editor.putBoolean(getString(R.string.WelcomeScreenShowedKey),true);
+                editor.putBoolean(getString(R.string.AutoUpdateEnabledKey),
+                        (v.getId() == R.id.welcomeYesButton));
+                editor.apply();
                 Intent startMainActivity = new Intent(WelcomeActivity.this,WPDMainActivity.class);
                 startMainActivity.setAction(WPDMainActivity.SKIP_WELCOME_CHECK_ACTION);
                 startActivity(startMainActivity);
                 WelcomeActivity.this.finish();
             }
-        });
+        };
+        welcomeNoButton.setOnClickListener(clickListener);
+        welcomeYesButton.setOnClickListener(clickListener);
     }
 }

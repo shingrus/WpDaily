@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Daily WallPaper</string>
+    <string name="app_name">Photo of the Day</string>
 
     <!-- Strings related to Settings -->
 
@@ -26,11 +26,10 @@
     <string name="ShowImageTitle" />
     <string name="menuitem_sharetoFB">Share photo to Facebook</string>
     <string name="menuitem_setwp">Set as Wallpaper</string>
-    <string name="AutomaticUpdateEnableCheckBoxName">Autoupdate Wallpaper</string>
     <string name="AutoUpdateEnabledKey" translatable="false">automaticUpdateEnabled</string>
     <string name="WelcomeScreenShowedKey" translatable="false">welcomeScreenShowed</string>
-    <string name="WelcomeScreenContinueButton">Next</string>
-    <string name="welcomeText">Wallpaper will be set automatically, every 6 hours</string>
+    <string name="WelcomeScreenContinueButton">Yes</string>
+    <string name="welcomeText">Would you like to update the wallpaper automatically, every 6 hours?</string>
     <string name="ImageContentDescription">Image</string>
     <string name="menuitem_delete">Delete</string>
     <string name="aboutKey" translatable="false">aboutPreference</string>
@@ -39,4 +38,6 @@
     <string name="toastWPChanged">Wallpaper has been changed.</string>
     <string name="facebook_app_id" translatable="false">585927454887632</string>
     <string name="menuitem_shareimage">Share image</string>
+    <string name="WelcomeScreenContinueYesButton">Yes</string>
+    <string name="WelcomeScreenContinueNoButton">No</string>
 </resources>

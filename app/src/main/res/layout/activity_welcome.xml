@@ -11,34 +11,55 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <android.support.v7.widget.SwitchCompat
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:gravity="center"
+        android:text="@string/welcomeText"
+        android:padding="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    <!-- android.support.v7.widget.SwitchCompat
         android:id="@+id/welcomeEnableAutoUpdate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
         android:checked="true"
         android:text="@string/AutomaticUpdateEnableCheckBoxName"
-        android:textSize="16sp" />
-
-
-    <TextView
-        android:id="@+id/textView"
+        android:textSize="16sp" / -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/welcomeText"
-        android:padding="10dp"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:orientation="horizontal"
+        android:layout_gravity="bottom|center"
+        android:gravity="center">
+        <Button
+            android:id="@+id/welcomeNoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_weight="0"
+            android:background="@color/greyButton"
+            android:text="@string/WelcomeScreenContinueNoButton" />
+        <Space
+            android:layout_height="0dp"
+            android:layout_width="5dp" />
+
+        <Button
+            android:id="@+id/welcomeYesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_weight="0"
+            android:background="@color/greenButton"
+            android:text="@string/WelcomeScreenContinueYesButton" />
+    </LinearLayout>
     <Space
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <Button
-        android:id="@+id/welcomeContinueButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_weight="0"
-        android:text="@string/WelcomeScreenContinueButton" />
+
+
 </LinearLayout>

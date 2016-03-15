@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Обои каждый день</string>
+    <string name="app_name">Фотографии дня</string>
 
     <!-- Strings related to Settings -->
 
@@ -28,14 +28,15 @@
     <string name="menuitem_sharetoFB">Поделиться в Facebook</string>
     <string name="menuitem_setwp">Установить Обои</string>
     <string name="menuitem_delete">Удалить</string>
-    <string name="AutomaticUpdateEnableCheckBoxName">Автоматически обновлять фон</string>
     <string name="WelcomeScreenContinueButton">Дальше</string>
-    <string name="welcomeText">Фон будет обновляться автоматически каждые 6 часов</string>
+    <string name="welcomeText">Вы хотите, чтобы фон обновлялся автоматически каждые 6 часов?</string>
     <string name="ImageContentDescription">Изображение</string>
     <string name="ShareToTitle">Поделиться фото&#8230;</string>
     <string name="menuitem_browser">Открыть в браузере&#8230;</string>
     <string name="toastWPChanged">Новый фон установлен.</string>
     <string name="menuitem_shareimage">Поделиться изображением</string>
+    <string name="WelcomeScreenContinueYesButton">Да</string>
+    <string name="WelcomeScreenContinueNoButton">Нет</string>
 
 
 </resources>
