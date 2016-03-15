@@ -7,18 +7,19 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.util.Log;
 import android.view.ContextMenu;
+
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,17 +33,20 @@ import com.facebook.FacebookSdk;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 
+import java.util.ArrayList;
+
 public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private static final String _log_tag = "WPD/WPDMainActivity";
     private static boolean isUpdating = false;
-    private ImageCursorAdapter imageCursorAdapter = null;
+    private ImagesAdapter imagesAdapter = null;
     private UpdateReceiver updateReceiver = new UpdateReceiver();
     IntentFilter filter = new IntentFilter(WPUpdateService.UPDATE_ACTIVITY_ACTION);
     public static final String SKIP_WELCOME_CHECK_ACTION = "com.shingrus.wpdaily.action.skip_welcome";
     private boolean isFBinstalled = false;
+
 
     /**
      * Implements OnRefreshListener
@@ -93,31 +97,37 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 
     private void updateImages() {
         Intent intent = new Intent(this.getApplicationContext(), WPUpdateService.class);
-        mSwipeRefreshLayout.setEnabled(true);
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+        });
         startService(intent);
         isUpdating = true;
 
     }
 
     private void deleteImage(final long itemId) {
+
         Log.d(_log_tag, "Ask for image delete:" + itemId);
-        new AsyncTask<Long, Void, Cursor>() {
+        new AsyncTask<Long, Void, ArrayList<ImageDescription>>() {
             @Override
-            protected Cursor doInBackground(Long... imageId) {
+            protected ArrayList<ImageDescription> doInBackground(Long... imageId) {
                 ImageStorage storage = ImageStorage.getInstance();
                 int deleteResult = storage.deleteImage(imageId[0]);
                 if (deleteResult > 0) {
                     Log.d(_log_tag, "Removed images number: " + deleteResult);
-                    return storage.getLastImagesCursor();
+                    return storage.getLastImages();
                 }
                 return null;
             }
 
             @Override
-            protected void onPostExecute(Cursor c) {
+            protected void onPostExecute(ArrayList<ImageDescription> images) {
 
-                if (imageCursorAdapter != null) {
-                    imageCursorAdapter.changeCursor(c);
+                if (imagesAdapter != null) {
+                    imagesAdapter.swapItems(images);
                 }
             }
 
@@ -125,20 +135,27 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 
     }
 
+
     private void getImagesFromStorage() {
 
-        new AsyncTask<Void, Void, Cursor>() {
+        new AsyncTask<Void, Void, ArrayList<ImageDescription>>() {
+
             @Override
-            protected Cursor doInBackground(Void... params) {
-                ImageStorage storage = ImageStorage.getInstance();
-                return storage.getLastImagesCursor();
+            protected void onPreExecute() {
+//                super.onPreExecute();
             }
 
             @Override
-            protected void onPostExecute(Cursor c) {
+            protected ArrayList<ImageDescription> doInBackground(Void... params) {
+                ImageStorage storage = ImageStorage.getInstance();
+                return storage.getLastImages();
+            }
 
-                if (imageCursorAdapter != null) {
-                    imageCursorAdapter.changeCursor(c);
+            @Override
+            protected void onPostExecute(ArrayList<ImageDescription> images) {
+
+                if (imagesAdapter != null) {
+                    imagesAdapter.swapItems(images);
                 }
             }
 
@@ -276,7 +293,7 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
                 return true;
             }
             case R.id.menu_action_browser: {
-                String link = imageCursorAdapter.getLinkPage(info.position);
+                String link = imagesAdapter.getItem(info.position).getLinkPage();
                 if (link != null) {
                     Intent sendIntent;
                     if (item.getItemId() == R.id.menu_action_browser) {
@@ -325,21 +342,12 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
             mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
             mSwipeRefreshLayout.setOnRefreshListener(this);
             ListView listView = (ListView) findViewById(R.id.images_list);
-            imageCursorAdapter = new ImageCursorAdapter(WPDMainActivity.this, null);
-            listView.setAdapter(imageCursorAdapter);
 
+            imagesAdapter = new ImagesAdapter(WPDMainActivity.this);
+
+
+            listView.setAdapter(imagesAdapter);
             registerForContextMenu(listView);
-
-
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Log.d(_log_tag, "Click on : "+ id);
-//                Intent intent = new Intent(WPDMainActivity.this, ShowImage.class);
-//                intent.putExtra(ShowImage.IMAGE_ID_KEY,id);
-//                startActivity(intent);
-//            }
-//        });
 
 
             //Load images
@@ -352,8 +360,6 @@ public class WPDMainActivity extends AppCompatActivity implements SwipeRefreshLa
 
     @Override
     protected void onDestroy() {
-        if (imageCursorAdapter != null)
-            imageCursorAdapter.changeCursor(null);
         super.onDestroy();
         Log.d(_log_tag, "Destroy main activity");
     }
