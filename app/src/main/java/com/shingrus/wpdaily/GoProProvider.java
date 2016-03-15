@@ -19,7 +19,6 @@ import java.util.Objects;
  * Gets photos from
  * https://gopro.com/channel/photo-of-the-day
  */
-
 public class GoProProvider implements WallpaperProvider {
     private static final String PROVIDER = "GoPro";
     private static final String whereToGetImages = "https://api.gopro.com/v2/channels/feed/playlists/photo-of-the-day.json?platform=web&page=1&per_page=1";
@@ -46,7 +45,7 @@ public class GoProProvider implements WallpaperProvider {
         if (contentLength != -1) {
             baos = new ByteArrayOutputStream(contentLength);
         } else {
-            baos = new ByteArrayOutputStream((1024 + 512) * 1024); //1.5 Mb
+            baos = new ByteArrayOutputStream(2048 * 1024); //1.5 Mb
         }
 
         //use here byte buffer
