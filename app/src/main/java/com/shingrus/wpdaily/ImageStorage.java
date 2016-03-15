@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -15,6 +14,7 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 /**
@@ -152,12 +152,57 @@ public class ImageStorage {
                         new ImageDescription(c.getString(2), c.getInt(1), c.getString(3), c.getString(4), b);
             }
         }
+        c.close();
         return retImage;
     }
 
+
+
+
+
     /**
+     *
+     *
+     *
      * @return ArrayList<ImageDescription> - array list of images
      */
+    public ArrayList<ImageDescription> getLastImages() {
+        SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
+
+
+        ArrayList<ImageDescription> retList = new ArrayList<>(30);
+
+        Cursor c= db.query(IMAGES_TABLE_NAME,
+                new String[]{IMAGES_COLUMN_IMAGE, IMAGES_COLUMN_DATE_INSERTED,
+                        IMAGES_COLUMN_URL, IMAGES_COLUMN_PROVIDER, IMAGES_COLUMN_ID, IMAGES_COLUMN_LINKPAGE},
+                IMAGES_COLUMN_DATE_INSERTED + "> ?",
+                new String[]{"0"},
+                null,
+                null,
+                IMAGES_COLUMN_DATE_INSERTED + " desc",
+                IMAGES_LAST_IMAGES_LIMIT);
+        int image_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_IMAGE);
+        int date_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_DATE_INSERTED);
+        int provider_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_PROVIDER);
+        int linkPage_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_LINKPAGE);
+        int url_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_URL);
+        int id_idx = c.getColumnIndex(ImageStorage.IMAGES_COLUMN_ID);
+        while (c.moveToNext()) {
+
+
+            int id = c.getInt(id_idx);
+            ImageDescription imageDescription = new ImageDescription(c.getString(url_idx), c.getInt(date_idx),
+                     c.getString(provider_idx), c.getString(linkPage_idx), null);
+
+            Log.d(_log_tag, "Loadimage: " + id);
+            imageDescription.setID(id);
+            retList.add(imageDescription);
+        }
+        c.close();
+        return retList;
+
+
+    }
     public Cursor getLastImagesCursor() {
         SQLiteDatabase db = mImageDBHelper.getReadableDatabase();
 
@@ -172,6 +217,7 @@ public class ImageStorage {
                 IMAGES_LAST_IMAGES_LIMIT);
 
     }
+
 
     private class ImageDBHelper extends SQLiteOpenHelper {
         public ImageDBHelper(Context context) {
@@ -213,7 +259,7 @@ public class ImageStorage {
         return sInstance;
     }
 
-    public Uri saveImageToExternal(Bitmap bm) {
+    public  Uri saveImageToExternal(Bitmap bm) {
         //Create Path to save Image
         Uri retVal = null;
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + appFolder); //Creates app specific folder
