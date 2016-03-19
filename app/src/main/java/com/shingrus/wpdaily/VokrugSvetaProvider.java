@@ -108,4 +108,9 @@ public class VokrugSvetaProvider implements WallpaperProvider {
         }
         return retVal;
     }
+
+    @Override
+    public boolean isWallpaperSource() {
+        return true;
+    }
 }

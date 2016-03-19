@@ -10,4 +10,5 @@ import java.net.URL;
 interface WallpaperProvider {
     String getWallpaperProvider();
     ImageDescription GetLastWallpaperLink() throws IOException;
+    boolean isWallpaperSource();
 }

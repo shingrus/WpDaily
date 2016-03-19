@@ -30,6 +30,7 @@ public class GoProProvider implements WallpaperProvider {
         return PROVIDER;
     }
 
+
     @Override
     public ImageDescription GetLastWallpaperLink() throws IOException {
         ImageDescription retVal = null;
@@ -83,5 +84,10 @@ public class GoProProvider implements WallpaperProvider {
 
         }
         return retVal;
+    }
+
+    @Override
+    public final boolean isWallpaperSource() {
+        return false;
     }
 }

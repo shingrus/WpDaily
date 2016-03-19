@@ -116,4 +116,9 @@ public class NationalGeographicProvider implements WallpaperProvider {
 
         return returnImage;
     }
+
+    @Override
+    public boolean isWallpaperSource() {
+        return true;
+    }
 }

@@ -100,4 +100,9 @@ public class BingProvider implements WallpaperProvider {
         return retVal;
 
     }
+
+    @Override
+    public boolean isWallpaperSource() {
+        return true;
+    }
 }

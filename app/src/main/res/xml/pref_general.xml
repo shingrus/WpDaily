@@ -21,14 +21,19 @@
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
          dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <PreferenceCategory
+        android:title="@string/AutomaticUpdateTitle">
+
+
     <SwitchPreference
         android:title="@string/AutomaticUpdateEnableCheckBoxName"
         android:key="@string/AutoUpdateEnabledKey"
         android:defaultValue="true"
+        android:singleLine="false"
         />
+
     <ListPreference
         android:defaultValue="360"
-
         android:entries="@array/pref_sync_frequency_titles"
         android:entryValues="@array/pref_sync_frequency_values"
         android:key="@string/update_freq_list"
@@ -36,7 +41,10 @@
         android:positiveButtonText="@null"
         android:title="@string/pref_title_sync_frequency"
         android:dependency="@string/AutoUpdateEnabledKey"/>
+    </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/OnBootTitle"/>
     <SwitchPreference
         android:title="@string/OnBootCheckBoxName"
         android:key="@string/onBootEnabledKey"

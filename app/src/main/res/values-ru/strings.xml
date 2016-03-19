@@ -22,12 +22,13 @@
 
 
     <string name="aboutLabel">Сборка:\u00A0</string>
-    <string name="OnBootCheckBoxName">Запускать после растарта</string>
+    <string name="OnBootCheckBoxName">Запуск</string>
     <string name="action_settings">Settings</string>
     <string name="ShowImageTitle" />
     <string name="menuitem_sharetoFB">Поделиться в Facebook</string>
     <string name="menuitem_setwp">Установить Обои</string>
     <string name="menuitem_delete">Удалить</string>
+    <string name="AutomaticUpdateEnableCheckBoxName">Автоапдейт</string>
     <string name="WelcomeScreenContinueButton">Дальше</string>
     <string name="welcomeText">Вы хотите, чтобы фон обновлялся автоматически каждые 6 часов?</string>
     <string name="ImageContentDescription">Изображение</string>
@@ -37,6 +38,8 @@
     <string name="menuitem_shareimage">Поделиться изображением</string>
     <string name="WelcomeScreenContinueYesButton">Да</string>
     <string name="WelcomeScreenContinueNoButton">Нет</string>
+    <string name="AutomaticUpdateTitle">Автоапдейт фона</string>
+    <string name="OnBootTitle">Запускать после рестарта</string>
 
 
 </resources>

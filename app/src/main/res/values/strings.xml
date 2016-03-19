@@ -20,12 +20,13 @@
 
     <string name="update_freq_list" translatable="false">upadate_freq_list</string>
     <string name="aboutLabel">Build number:\u00A0</string>
-    <string name="OnBootCheckBoxName">Start update after reboot</string>
+    <string name="OnBootCheckBoxName">Start</string>
     <string name="onBootEnabledKey" translatable="false">onBootEnabled</string>
     <string name="action_settings">Settings</string>
     <string name="ShowImageTitle" />
     <string name="menuitem_sharetoFB">Share photo to Facebook</string>
     <string name="menuitem_setwp">Set as Wallpaper</string>
+    <string name="AutomaticUpdateEnableCheckBoxName">Autoupdate</string>
     <string name="AutoUpdateEnabledKey" translatable="false">automaticUpdateEnabled</string>
     <string name="WelcomeScreenShowedKey" translatable="false">welcomeScreenShowed</string>
     <string name="WelcomeScreenContinueButton">Yes</string>
@@ -40,4 +41,6 @@
     <string name="menuitem_shareimage">Share image</string>
     <string name="WelcomeScreenContinueYesButton">Yes</string>
     <string name="WelcomeScreenContinueNoButton">No</string>
+    <string name="AutomaticUpdateTitle">Autoupdate wallpaper</string>
+    <string name="OnBootTitle">Start update after reboot</string>
 </resources>
