@@ -143,7 +143,7 @@ public final class SetWallPaper {
      * @param imageDescription - ImageDescription where to get  new image
      * @return true if new image found, false - if not
      */
-    private synchronized UpdateResult setWallPaperImage(ImageDescription imageDescription) {
+    private synchronized UpdateResult storeAndSetWallPaperImage(ImageDescription imageDescription, boolean setWallpaper) {
         UpdateResult retVal = UpdateResult.FAIL;
         ImageStorage storage = ImageStorage.getInstance(appContext);
         if (!storage.isUrlAlreadyDownloaded(imageDescription)) {
@@ -152,8 +152,8 @@ public final class SetWallPaper {
 
                 byte[] imageBuf = getImage(url);
 
-                if (imageBuf.length > 0) {
-                    if (isMoreTimeElapsed())
+                if (imageBuf!=null && imageBuf.length > 0) {
+                    if (setWallpaper && isMoreTimeElapsed())
                         setWallPaperImage(imageBuf);
                     Log.d(_log_tag, "Store image but don't update wallpaper.");
 
@@ -190,7 +190,7 @@ public final class SetWallPaper {
                 Log.d(_log_tag, "Check provider:" + currentProvider + "; i:" + i + ";count: " + count);
                 ImageDescription imageDescription = currentProvider.GetLastWallpaperLink();
                 if (imageDescription != null) {
-                    retVal = setWallPaperImage(imageDescription);
+                    retVal = storeAndSetWallPaperImage(imageDescription,currentProvider.isWallpaperSource());
 //                    if (retVal == UpdateResult.SUCCESS || retVal == UpdateResult.NETWORK_FAIL)
 //                        break;
                 } else {
