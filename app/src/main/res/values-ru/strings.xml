@@ -10,11 +10,13 @@
 
     <string name="pref_title_sync_frequency">Частота обновлений</string>
     <string-array name="pref_sync_frequency_titles">
+        <item>1 час</item>
         <item>3 часа</item>
         <item>6 часов</item>
         <item>24 часа</item>
     </string-array>
     <string-array name="pref_sync_frequency_values">
+        <item>60</item>
         <item>180</item>
         <item>360</item>
         <item>1440</item>
