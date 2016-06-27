@@ -163,17 +163,20 @@ public class ImagesAdapter extends BaseAdapter {
         BitmapFactory.decodeByteArray(imageData, 0, imageData.length, options);
 
 
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth);
-
 
         int reqHeight;
-        if (reqWidth < options.outWidth) {
+        if (reqWidth*2 < options.outWidth) {
+            reqWidth*=2;
             reqHeight = reqWidth * options.outHeight / options.outWidth;
         }
         else {
             reqHeight = options.outHeight;
+            reqWidth = options.outWidth;
         }
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth);
+
 
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
